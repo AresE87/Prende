@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Flame } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Flame, User } from 'lucide-react'
 
 const navLinks = [
   { label: 'Cómo funciona', href: '#como-funciona' },
@@ -58,8 +59,17 @@ export default function Navbar() {
         ))}
       </div>
 
-      {/* CTA + Mobile Toggle */}
+      {/* CTA + Login + Mobile Toggle */}
       <div className="flex items-center gap-3">
+        <Link
+          to="/login"
+          className={`hidden sm:inline-flex items-center gap-1.5 font-jakarta font-medium text-sm px-4 py-2.5 rounded-full transition-all duration-300 hover:text-brasa ${
+            scrolled ? 'text-carbon/70' : 'text-crema/80'
+          }`}
+        >
+          <User className="w-4 h-4" />
+          Ingresá
+        </Link>
         <a
           href="#reserva"
           className="hidden sm:inline-flex items-center gap-2 bg-brasa text-crema font-jakarta font-semibold text-sm px-5 py-2.5 rounded-full hover:translate-y-[-1px] hover:shadow-lg hover:shadow-brasa/20 transition-all duration-300 relative overflow-hidden group"
@@ -108,10 +118,18 @@ export default function Navbar() {
                 {link.label}
               </a>
             ))}
+            <Link
+              to="/login"
+              onClick={() => setMobileOpen(false)}
+              className="inline-flex items-center justify-center gap-2 border border-brasa/20 text-carbon font-jakarta font-semibold text-base px-6 py-3 rounded-full mt-2"
+            >
+              <User className="w-4 h-4" />
+              Ingresá
+            </Link>
             <a
               href="#reserva"
               onClick={() => setMobileOpen(false)}
-              className="inline-flex items-center justify-center bg-brasa text-crema font-jakarta font-semibold text-base px-6 py-3 rounded-full mt-2"
+              className="inline-flex items-center justify-center bg-brasa text-crema font-jakarta font-semibold text-base px-6 py-3 rounded-full"
             >
               Reservá tu espacio
             </a>
