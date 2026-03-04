@@ -47,6 +47,8 @@ export function AppProvider({ children }) {
         await loadUserProfile(session.user, dispatch);
       }
       setAuthLoading(false);
+    }).catch(() => {
+      setAuthLoading(false);
     });
 
     // Listener para cambios de auth (login, logout, token refresh)
