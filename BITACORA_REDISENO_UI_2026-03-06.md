@@ -226,6 +226,25 @@ Solucion aplicada:
 - mejor balance entre tonos claros, calidos y profundos
 - menos repeticion y mas identidad por panel
 
+## Ajuste posterior: copy orientado al negocio
+
+Se corrigio el contenido textual de la seccion `Features` para que deje de hablar del diseño y pase a hablar de la propuesta real de Prende.
+
+Cambios aplicados:
+
+- el titulo principal ahora habla de buscar, comparar y reservar espacios con parrilla
+- el subtitulo describe exploracion por zona, disponibilidad real y reserva online
+- los paneles pasaron a usar lenguaje de producto:
+  - busqueda por zona
+  - agenda disponible
+  - seguimiento de reserva
+- se incorporaron keywords mas alineadas con la pagina:
+  - espacios con parrilla
+  - barbacoas
+  - quinchos
+  - Montevideo
+  - reserva online
+
 ## Como seguiria yo este rediseño
 
 ### 1. Host flows
