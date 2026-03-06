@@ -1,136 +1,213 @@
-// supabase/functions/mp-release-payment/index.ts
-// Transfiere el pago al host una vez que el evento se completó
-//
-// Puede ser llamada:
-//   - Por un cron job diario (Supabase Cron, o GitHub Actions)
-//   - Manualmente por el equipo de Prende para un booking específico
-//
-// POST /functions/v1/mp-release-payment
-// Body: { bookingId?: string }  ← si se omite, procesa todos los pendientes
-
 import { serve } from "https://deno.land/std@0.208.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-payments-secret",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
+type ReleaseRequest = {
+  bookingId?: string;
+  action?: "release" | "refund";
 };
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
+  if (req.method !== "POST") return json({ error: "Metodo no permitido" }, 405);
 
   try {
     const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      mustEnv("SUPABASE_URL"),
+      mustEnv("SUPABASE_SERVICE_ROLE_KEY"),
     );
 
-    const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
-    const { bookingId } = body;
+    const body = await req.json().catch(() => ({})) as ReleaseRequest;
+    const action = body.action ?? "release";
 
-    // ── 1. Obtener reservas listas para pagar al host ─────────
-    // Criterios:
-    // - status = 'paid' o 'confirmed'
-    // - payment_status = 'approved'
-    // - El evento ya ocurrió (date + end_time < ahora)
-    // - payment_released_at IS NULL (no pagadas aún)
-    // - Opcionalmente filtrar por bookingId específico
-
-    const RELEASE_DELAY_DAYS = parseInt(Deno.env.get("PAYMENT_RELEASE_DELAY_DAYS") ?? "1");
-    const releaseThreshold   = new Date();
-    releaseThreshold.setDate(releaseThreshold.getDate() - RELEASE_DELAY_DAYS);
-
-    let query = supabase
-      .from("bookings")
-      .select(`
-        *,
-        profiles!host_id ( full_name, phone, mp_account_id )
-      `)
-      .in("status", ["paid", "confirmed"])
-      .eq("payment_status", "approved")
-      .is("payment_released_at", null)
-      .lte("date", releaseThreshold.toISOString().split("T")[0]);
-
-    if (bookingId) {
-      query = query.eq("id", bookingId);
+    if (action === "refund") {
+      return await handleRefundAction(req, supabase, body.bookingId);
     }
 
-    const { data: bookings, error: fetchError } = await query;
-
-    if (fetchError) {
-      return json({ error: "Error obteniendo reservas" }, 500);
-    }
-
-    if (!bookings || bookings.length === 0) {
-      return json({ message: "No hay pagos pendientes de liberar", processed: 0 });
-    }
-
-    const results = await Promise.allSettled(
-      bookings.map(booking => releasePaymentToHost(supabase, booking))
-    );
-
-    const successful = results.filter(r => r.status === "fulfilled").length;
-    const failed     = results.filter(r => r.status === "rejected").length;
-
-    if (failed > 0) {
-      const errors = results
-        .filter((r): r is PromiseRejectedResult => r.status === "rejected")
-        .map(r => r.reason?.message);
-      console.error("Pagos fallidos:", errors);
-    }
-
-    return json({
-      message: `Procesados ${bookings.length} pagos: ${successful} exitosos, ${failed} fallidos`,
-      processed: successful,
-      failed,
-    });
-
+    return await handleReleaseAction(req, supabase, body.bookingId);
   } catch (err) {
-    console.error("Error en mp-release-payment:", err);
-    return json({ error: "Error interno" }, 500);
+    console.error("Error en mp-release-payment", err);
+    return json({ error: "internal_error" }, 500);
   }
 });
 
-// ─── TRANSFER AL HOST ────────────────────────────────────────
+async function handleReleaseAction(
+  req: Request,
+  supabase: ReturnType<typeof createClient>,
+  bookingId?: string,
+): Promise<Response> {
+  const releaseSecret = mustEnv("PAYMENT_RELEASE_SECRET");
+  const receivedSecret = req.headers.get("x-payments-secret");
+  if (!receivedSecret || receivedSecret !== releaseSecret) {
+    return json({ error: "No autorizado para liberar pagos" }, 401);
+  }
+
+  const releaseDelayDays = parseInt(Deno.env.get("PAYMENT_RELEASE_DELAY_DAYS") ?? "1", 10);
+  const releaseThreshold = new Date();
+  releaseThreshold.setDate(releaseThreshold.getDate() - releaseDelayDays);
+
+  let query = supabase
+    .from("bookings")
+    .select(`
+      id,
+      host_id,
+      host_payout,
+      payment_status,
+      status,
+      date,
+      mp_disbursement_id,
+      profiles!host_id ( mp_account_id )
+    `)
+    .in("status", ["paid", "confirmed"])
+    .eq("payment_status", "approved")
+    .is("payment_released_at", null)
+    .lte("date", releaseThreshold.toISOString().slice(0, 10));
+
+  if (bookingId) {
+    query = query.eq("id", bookingId);
+  }
+
+  const { data: bookings, error: bookingsError } = await query;
+  if (bookingsError) {
+    console.error("Error buscando bookings para release", bookingsError);
+    return json({ error: "No se pudo cargar reservas pendientes" }, 500);
+  }
+
+  if (!bookings || bookings.length === 0) {
+    return json({ message: "No hay pagos pendientes de liberar", processed: 0, failed: 0 });
+  }
+
+  const results = await Promise.allSettled(
+    bookings.map((booking) => releasePaymentToHost(supabase, booking as Record<string, unknown>)),
+  );
+
+  const successful = results.filter((result) => result.status === "fulfilled").length;
+  const failed = results.length - successful;
+
+  const errors = results
+    .filter((result): result is PromiseRejectedResult => result.status === "rejected")
+    .map((result) => String(result.reason));
+
+  return json({
+    message: `Procesados ${results.length} pagos`,
+    processed: successful,
+    failed,
+    errors,
+  });
+}
+
+async function handleRefundAction(
+  req: Request,
+  supabase: ReturnType<typeof createClient>,
+  bookingId?: string,
+): Promise<Response> {
+  if (!bookingId) return json({ error: "bookingId es obligatorio para reembolso" }, 400);
+
+  const user = await getUserFromRequest(req, supabase);
+  if (!user) return json({ error: "No autorizado" }, 401);
+
+  const { data: booking, error: bookingError } = await supabase
+    .from("bookings")
+    .select("id, guest_id, status, cancellation_deadline, mp_payment_id, total_charged")
+    .eq("id", bookingId)
+    .maybeSingle();
+
+  if (bookingError || !booking) return json({ error: "Reserva no encontrada" }, 404);
+  if (booking.guest_id !== user.id) return json({ error: "No podes cancelar esta reserva" }, 403);
+  if (!(["paid", "confirmed"] as string[]).includes(booking.status)) {
+    return json({ error: "Esta reserva no admite reembolso" }, 400);
+  }
+
+  if (!booking.mp_payment_id) {
+    return json({ error: "La reserva no tiene pago asociado" }, 400);
+  }
+
+  const now = new Date();
+  const deadline = new Date(booking.cancellation_deadline);
+  if (now > deadline) {
+    return json({ error: "Fuera del plazo de reembolso" }, 400);
+  }
+
+  const refundResponse = await fetch(
+    `https://api.mercadopago.com/v1/payments/${booking.mp_payment_id}/refunds`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${mustEnv("MP_ACCESS_TOKEN")}`,
+        "Content-Type": "application/json",
+        "X-Idempotency-Key": `refund-${booking.id}`,
+      },
+      body: JSON.stringify({ amount: booking.total_charged }),
+    },
+  );
+
+  if (!refundResponse.ok) {
+    const error = await safeJson(refundResponse);
+    console.error("Error reembolsando en MP", error);
+    return json({ error: "No se pudo procesar el reembolso" }, 502);
+  }
+
+  await supabase
+    .from("bookings")
+    .update({
+      status: "cancelled",
+      payment_status: "refunded",
+      payment_error: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", booking.id);
+
+  await triggerNotifications(supabase, booking.id, "payment_refunded");
+
+  return json({
+    ok: true,
+    refunded: true,
+    bookingId: booking.id,
+    amount: booking.total_charged,
+  });
+}
 
 async function releasePaymentToHost(
   supabase: ReturnType<typeof createClient>,
-  booking: Record<string, unknown> & { profiles?: { mp_account_id?: string } }
-) {
-  const mpAccessToken = Deno.env.get("MP_ACCESS_TOKEN")!;
-  const hostMPAccountId = booking.profiles?.mp_account_id;
+  booking: Record<string, unknown>,
+): Promise<void> {
+  const bookingId = asString(booking.id);
+  const hostId = asString(booking.host_id);
+  const hostPayout = toInteger(booking.host_payout);
 
-  console.log(`Procesando pago booking ${booking.id}, host_payout: ${booking.host_payout} UYU`);
+  if (!bookingId || !hostId || hostPayout == null || hostPayout <= 0) {
+    throw new Error("booking_data_invalida");
+  }
+
+  const profile = booking.profiles as Record<string, unknown> | null;
+  const hostMPAccountId = asString(profile?.mp_account_id);
 
   if (!hostMPAccountId) {
-    // Host no tiene cuenta MP vinculada → marcar para pago manual
     await supabase
       .from("bookings")
       .update({
-        payment_status: "released",  // marcado como procesado
-        payment_released_at: new Date().toISOString(),
+        payment_status: "approved",
+        payment_error: "manual_payout_required",
         updated_at: new Date().toISOString(),
       })
-      .eq("id", booking.id as string);
+      .eq("id", bookingId);
 
-    console.warn(`Host ${booking.host_id} sin cuenta MP. Pago marcado para liquidación manual.`);
-
-    // Notificar al equipo interno
     await supabase.functions.invoke("send-notifications", {
-      body: { bookingId: booking.id, trigger: "manual_payout_required" },
+      body: { bookingId, trigger: "manual_payout_required" },
     });
     return;
   }
 
-  // ── Transfer via MP Payments API ─────────────────────────────
-  // Prende debe tener el dinero en su cuenta MP primero (ya cobrado en el checkout)
-  // Luego transfiere al host usando la API de transferencias
-
   const transferPayload = {
-    transaction_amount: booking.host_payout as number,
+    transaction_amount: hostPayout,
     currency_id: "UYU",
-    description: `Pago reserva Prende: ${booking.id}`,
-    payment_method_id: "account_money",    // desde el saldo de MP de Prende
+    description: `Pago reserva Prende ${bookingId}`,
+    payment_method_id: "account_money",
     payer: {
       type: "customer",
       id: hostMPAccountId,
@@ -140,108 +217,107 @@ async function releasePaymentToHost(
   const transferResponse = await fetch("https://api.mercadopago.com/v1/payments", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${mpAccessToken}`,
+      Authorization: `Bearer ${mustEnv("MP_ACCESS_TOKEN")}`,
       "Content-Type": "application/json",
-      "X-Idempotency-Key": `payout-${booking.id}`,
+      "X-Idempotency-Key": `payout-${bookingId}`,
     },
     body: JSON.stringify(transferPayload),
   });
 
   if (!transferResponse.ok) {
-    const err = await transferResponse.json();
-    console.error("Error en transfer MP:", JSON.stringify(err));
+    const error = await safeJson(transferResponse);
+    console.error("Error en transferencia MP", { bookingId, error });
 
-    // FALLBACK: marcar para revisión manual en lugar de fallar silenciosamente
     await supabase
       .from("bookings")
       .update({
-        payment_status: "approved",  // mantener approved, no liberar hasta review
+        payment_status: "approved",
+        payment_error: "payout_transfer_failed",
         updated_at: new Date().toISOString(),
       })
-      .eq("id", booking.id as string);
+      .eq("id", bookingId);
 
-    throw new Error(`MP transfer falló para booking ${booking.id}: ${JSON.stringify(err)}`);
+    throw new Error(`payout_transfer_failed:${bookingId}`);
   }
 
-  const transfer = await transferResponse.json();
+  const transfer = await transferResponse.json() as { id?: string | number };
 
-  // ── Actualizar booking con el ID de la transferencia ─────────
   await supabase
     .from("bookings")
     .update({
-      mp_disbursement_id:  String(transfer.id),
-      payment_status:      "released",
+      mp_disbursement_id: transfer.id ? String(transfer.id) : null,
+      payment_status: "released",
       payment_released_at: new Date().toISOString(),
-      status:              "completed",
-      updated_at:          new Date().toISOString(),
-    })
-    .eq("id", booking.id as string);
-
-  console.log(`✅ Pago liberado al host para booking ${booking.id}. Transfer ID: ${transfer.id}`);
-
-  // Notificar al host y solicitar reseña al guest
-  await supabase.functions.invoke("send-notifications", {
-    body: { bookingId: booking.id, trigger: "payment_released" },
-  });
-}
-
-// ─── ENDPOINT MANUAL DE REEMBOLSO ───────────────────────────
-// Para cancelaciones >24h antes → reembolso automático
-
-export async function refundBooking(
-  bookingId: string,
-  mpAccessToken: string,
-  supabase: ReturnType<typeof createClient>
-) {
-  const { data: booking } = await supabase
-    .from("bookings")
-    .select("mp_payment_id, total_charged, cancellation_deadline")
-    .eq("id", bookingId)
-    .single();
-
-  if (!booking || !booking.mp_payment_id) {
-    throw new Error("Booking no encontrado o sin pago");
-  }
-
-  // Verificar que está dentro del plazo de reembolso
-  const now      = new Date();
-  const deadline = new Date(booking.cancellation_deadline);
-
-  if (now > deadline) {
-    throw new Error("Fuera del plazo de reembolso (24h antes del evento)");
-  }
-
-  // Emitir reembolso en MP
-  const refundResponse = await fetch(
-    `https://api.mercadopago.com/v1/payments/${booking.mp_payment_id}/refunds`,
-    {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${mpAccessToken}`,
-        "Content-Type": "application/json",
-        "X-Idempotency-Key": `refund-${bookingId}`,
-      },
-      body: JSON.stringify({ amount: booking.total_charged }),
-    }
-  );
-
-  if (!refundResponse.ok) {
-    throw new Error("Error procesando reembolso en MP");
-  }
-
-  await supabase
-    .from("bookings")
-    .update({
-      status:         "cancelled",
-      payment_status: "refunded",
-      updated_at:     new Date().toISOString(),
+      payment_error: null,
+      status: "completed",
+      updated_at: new Date().toISOString(),
     })
     .eq("id", bookingId);
+
+  await triggerNotifications(supabase, bookingId, "payment_released");
 }
 
-function json(data: unknown, status = 200) {
+async function triggerNotifications(
+  supabase: ReturnType<typeof createClient>,
+  bookingId: string,
+  trigger: "payment_refunded" | "payment_released" | "manual_payout_required",
+): Promise<void> {
+  try {
+    await supabase.functions.invoke("send-notifications", {
+      body: { bookingId, trigger },
+    });
+  } catch (err) {
+    console.error("Error enviando notificacion", err);
+  }
+}
+
+async function getUserFromRequest(
+  req: Request,
+  supabase: ReturnType<typeof createClient>,
+): Promise<{ id: string } | null> {
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) return null;
+
+  const token = authHeader.replace("Bearer ", "");
+  const { data: { user }, error } = await supabase.auth.getUser(token);
+
+  if (error || !user) return null;
+  return { id: user.id };
+}
+
+function asString(value: unknown): string | null {
+  if (typeof value === "string" && value.trim().length > 0) return value;
+  if (typeof value === "number") return String(value);
+  return null;
+}
+
+function toInteger(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return Math.round(value);
+  if (typeof value === "string" && value.trim().length > 0) {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) return Math.round(parsed);
+  }
+  return null;
+}
+
+async function safeJson(response: Response): Promise<unknown> {
+  try {
+    return await response.json();
+  } catch {
+    return { message: "Unable to parse JSON" };
+  }
+}
+
+function mustEnv(name: string): string {
+  const value = Deno.env.get(name);
+  if (!value) throw new Error(`Missing env var: ${name}`);
+  return value;
+}
+
+function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
     status,
     headers: { ...CORS, "Content-Type": "application/json" },
   });
 }
+
