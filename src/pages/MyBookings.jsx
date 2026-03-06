@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button, Card, StatusBadge, EmptyState, PageContainer, SectionTitle, Skeleton } from "../components/shared";
+import { getTicketInstructions } from "../lib/payments";
 import { formatUYU, formatDate } from "../lib/utils";
 import { getMyBookings } from "../lib/supabase";
 import { useReservation } from "../hooks/useReservation";
@@ -174,12 +175,18 @@ function BookingRow({ booking, navigate, past = false, onCancel, cancelling = fa
     ? booking.space.photos[0]
     : PLACEHOLDER_IMAGE;
 
-  const status = booking.payment_status === "pending" && booking.status === "pending"
+  const ticketInstructions = getTicketInstructions(booking);
+  const isTicketPending = booking.payment_method_type === "ticket" && booking.payment_status === "pending";
+
+  const status = booking.payment_status === "rejected"
+    ? "rejected"
+    : booking.payment_status === "pending" && booking.status === "pending"
     ? "pending"
     : booking.status;
 
-  const showCancel = !past && ["paid", "confirmed"].includes(booking.status);
+  const showCancel = !past && ["pending", "paid", "confirmed"].includes(booking.status);
   const showReview = past && booking.status === "completed";
+  const showVoucher = Boolean(ticketInstructions.ticketUrl) && isTicketPending;
 
   return (
     <Card className="p-4">
@@ -200,8 +207,26 @@ function BookingRow({ booking, navigate, past = false, onCancel, cancelling = fa
         </div>
       </div>
 
-      {(showCancel || showReview) && (
+      {isTicketPending && (
+        <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3">
+          <p className="text-sm font-semibold text-amber-800 font-['Inter']">
+            Completa el pago en {ticketInstructions.methodLabel}
+          </p>
+          <p className="mt-1 text-xs text-amber-700 font-['Inter']">
+            Vence: {formatPendingDate(ticketInstructions.expiresAt)}
+            {ticketInstructions.reference ? ` · Ref. ${ticketInstructions.reference}` : ""}
+          </p>
+        </div>
+      )}
+
+      {(showCancel || showReview || showVoucher) && (
         <div className="mt-3 pt-3 border-t border-[#1C1917]/8 flex justify-end gap-2">
+          {showVoucher && (
+            <Button size="sm" variant="outline" onClick={() => window.open(ticketInstructions.ticketUrl ?? "", "_blank", "noopener,noreferrer")}>
+              Ver comprobante
+            </Button>
+          )}
+
           {showCancel && (
             <Button size="sm" variant="danger" loading={cancelling} onClick={() => onCancel?.(booking.id)}>
               Cancelar
@@ -226,4 +251,14 @@ function BookingRow({ booking, navigate, past = false, onCancel, cancelling = fa
 function normalizeTime(value) {
   if (!value) return "--:--";
   return String(value).slice(0, 5);
+}
+
+function formatPendingDate(value) {
+  if (!value) return "sin vencimiento informado";
+  return new Date(value).toLocaleString("es-UY", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }

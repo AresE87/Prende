@@ -112,11 +112,10 @@ export default function Checkout() {
                 minHours={space.min_hours}
                 maxGuests={space.max_guests}
                 spaceName={space.title}
-                onConfirmed={() => navigate("/mis-reservas")}
               />
 
               <p className="text-xs text-[#1C1917]/40 mt-4 flex items-center gap-1.5 font-['Inter']">
-                <Shield size={12} /> Pago procesado por Mercado Pago. No almacenamos datos de tarjeta en Prende.
+                <Shield size={12} /> Tarjetas, Mercado Pago, Abitab y Red Pagos operan sobre infraestructura segura de Mercado Pago.
               </p>
             </Card>
           </div>

@@ -133,12 +133,13 @@ serve(async (req) => {
       return json({ ok: true, warning: reconciliationError });
     }
 
+    const paymentSnapshot = extractPaymentSnapshot(payment);
     const updatePayload = buildBookingUpdate(paymentStatus, {
       paymentId,
       preferenceId,
       merchantOrderId,
       statusDetail: paymentStatusDetail,
-    });
+    }, paymentSnapshot, booking.checkout_expires_at);
 
     if (!updatePayload) {
       await markEventProcessed(supabase, createdEvent.id);
@@ -191,13 +192,13 @@ async function fetchPaymentFromMP(paymentId: string): Promise<Record<string, unk
 async function findBookingForPayment(
   supabase: ReturnType<typeof createClient>,
   params: { externalReference: string | null; preferenceId: string | null; paymentId: string },
-): Promise<{ id: string; total_charged: number } | null> {
+): Promise<{ id: string; total_charged: number; checkout_expires_at: string | null } | null> {
   const { externalReference, preferenceId, paymentId } = params;
 
   if (externalReference) {
     const { data } = await supabase
       .from("bookings")
-      .select("id, total_charged")
+      .select("id, total_charged, checkout_expires_at")
       .eq("id", externalReference)
       .maybeSingle();
 
@@ -207,7 +208,7 @@ async function findBookingForPayment(
   if (preferenceId) {
     const { data } = await supabase
       .from("bookings")
-      .select("id, total_charged")
+      .select("id, total_charged, checkout_expires_at")
       .eq("mp_preference_id", preferenceId)
       .maybeSingle();
 
@@ -216,7 +217,7 @@ async function findBookingForPayment(
 
   const { data } = await supabase
     .from("bookings")
-    .select("id, total_charged")
+    .select("id, total_charged, checkout_expires_at")
     .eq("mp_payment_id", paymentId)
     .maybeSingle();
 
@@ -231,11 +232,21 @@ function buildBookingUpdate(
     merchantOrderId: string | null;
     statusDetail: string | null;
   },
+  paymentSnapshot: {
+    payment_method_id: string | null;
+    payment_method_type: string | null;
+    payment_metadata: Record<string, unknown>;
+  },
+  currentCheckoutExpiration: string | null,
 ): Record<string, unknown> | null {
   const base = {
     mp_payment_id: paymentIds.paymentId,
     mp_preference_id: paymentIds.preferenceId,
     mp_merchant_order_id: paymentIds.merchantOrderId,
+    payment_method_id: paymentSnapshot.payment_method_id,
+    payment_method_type: paymentSnapshot.payment_method_type,
+    payment_metadata: paymentSnapshot.payment_metadata,
+    checkout_expires_at: asString(paymentSnapshot.payment_metadata.date_of_expiration) ?? currentCheckoutExpiration,
     payment_error: null,
   };
 
@@ -247,10 +258,18 @@ function buildBookingUpdate(
     };
   }
 
+  if (paymentStatus === "pending" || paymentStatus === "in_process") {
+    return {
+      ...base,
+      status: "pending",
+      payment_status: "pending",
+    };
+  }
+
   if (paymentStatus === "rejected" || paymentStatus === "cancelled") {
     return {
       ...base,
-      status: "cancelled",
+      status: "pending",
       payment_status: "rejected",
       payment_error: paymentIds.statusDetail ?? "payment_rejected",
     };
@@ -273,6 +292,31 @@ function buildBookingUpdate(
   }
 
   return null;
+}
+
+function extractPaymentSnapshot(payment: Record<string, unknown>) {
+  const transactionDetails = isRecord(payment.transaction_details) ? payment.transaction_details : {};
+  const pointOfInteraction = isRecord(payment.point_of_interaction) ? payment.point_of_interaction : {};
+  const transactionData = isRecord(pointOfInteraction.transaction_data) ? pointOfInteraction.transaction_data : {};
+  const card = isRecord(payment.card) ? payment.card : {};
+
+  return {
+    payment_method_id: asString(payment.payment_method_id),
+    payment_method_type: asString(payment.payment_type_id),
+    payment_metadata: {
+      status: asString(payment.status),
+      status_detail: asString(payment.status_detail),
+      payment_method_id: asString(payment.payment_method_id),
+      payment_type_id: asString(payment.payment_type_id),
+      ticket_url: asString(transactionData.ticket_url) ?? asString(transactionDetails.external_resource_url),
+      external_resource_url: asString(transactionDetails.external_resource_url),
+      payment_reference: asString(transactionDetails.payment_method_reference_id),
+      barcode_content: asString(transactionData.barcode_content),
+      date_of_expiration: asString(payment.date_of_expiration),
+      installments: toInteger(payment.installments),
+      last_four_digits: asString(card.last_four_digits),
+    },
+  };
 }
 
 function reconcilePayment(expectedAmount: number, chargedAmount: number | null, currencyId: string | null): string | null {
@@ -380,6 +424,10 @@ function parseJson(value: string): unknown | null {
   } catch {
     return null;
   }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
 function extractEventPaymentId(event: unknown): string | null {

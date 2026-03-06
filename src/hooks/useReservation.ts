@@ -1,250 +1,267 @@
-// src/hooks/useReservation.ts
-// Hook que maneja el flujo completo de una reserva:
-// selecciÃƒÂ³n de horario Ã¢â€ â€™ creaciÃƒÂ³n de preferencia Ã¢â€ â€™ polling de estado
-
-import { useState, useCallback, useEffect, useRef } from "react";
-import { supabase, subscribeToBookingStatus, type Booking } from "../lib/supabase";
-
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ TIPOS Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+import { useCallback, useEffect, useRef, useState } from "react";
+import { getBookingById, subscribeToBooking, supabase, type Booking } from "../lib/supabase";
+import { getTicketInstructions } from "../lib/payments";
 
 export interface ReservationForm {
-  spaceId:         string;
-  date:            string;    // YYYY-MM-DD
-  startTime:       string;    // HH:MM
-  endTime:         string;    // HH:MM
-  guestCount:      number;
+  spaceId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  guestCount: number;
   specialRequests: string;
+}
+
+export interface EmbeddedPaymentPayload {
+  paymentType: string;
+  selectedPaymentMethod: string;
+  formData: Record<string, unknown>;
+  additionalData?: Record<string, unknown> | null;
+}
+
+export interface TicketInstructions {
+  methodId: string | null;
+  methodType: string | null;
+  methodLabel: string;
+  ticketUrl: string | null;
+  reference: string | null;
+  barcode: string | null;
+  expiresAt: string | null;
 }
 
 export type ReservationStep =
   | "idle"
-  | "validating"
-  | "creating_preference"
-  | "redirecting_to_mp"
-  | "waiting_payment"
+  | "preparing_checkout"
+  | "payment_ready"
+  | "processing_payment"
+  | "awaiting_confirmation"
+  | "awaiting_offline_payment"
   | "confirmed"
-  | "error"
   | "cancelled";
 
 export interface ReservationState {
-  step:            ReservationStep;
-  booking:         Booking | null;
-  preferenceId:    string | null;
-  mpInitPoint:     string | null;
-  error:           string | null;
-  totalHours:      number;
-  totalCharged:    number;    // UYU Ã¢â‚¬â€ lo que paga el guest
-  hostPayout:      number;    // UYU Ã¢â‚¬â€ lo que recibe el host
-  platformFee:     number;    // UYU Ã¢â‚¬â€ comisiÃƒÂ³n de Prende
+  step: ReservationStep;
+  booking: Booking | null;
+  bookingId: string | null;
+  preferenceId: string | null;
+  mpInitPoint: string | null;
+  checkoutExpiresAt: string | null;
+  error: string | null;
+  totalHours: number;
+  totalCharged: number;
+  hostPayout: number;
+  platformFee: number;
+  ticketInstructions: TicketInstructions | null;
 }
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ HOOK Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+const INITIAL_STATE: ReservationState = {
+  step: "idle",
+  booking: null,
+  bookingId: null,
+  preferenceId: null,
+  mpInitPoint: null,
+  checkoutExpiresAt: null,
+  error: null,
+  totalHours: 0,
+  totalCharged: 0,
+  hostPayout: 0,
+  platformFee: 0,
+  ticketInstructions: null,
+};
 
 export function useReservation() {
-  const [state, setState] = useState<ReservationState>({
-    step:          "idle",
-    booking:       null,
-    preferenceId:  null,
-    mpInitPoint:   null,
-    error:         null,
-    totalHours:    0,
-    totalCharged:  0,
-    hostPayout:    0,
-    platformFee:   0,
-  });
+  const [state, setState] = useState<ReservationState>(INITIAL_STATE);
+  const subscriptionRef = useRef<ReturnType<typeof subscribeToBooking> | null>(null);
 
-  const subscriptionRef = useRef<ReturnType<typeof subscribeToBookingStatus> | null>(null);
+  const syncFromBooking = useCallback((booking: Booking) => {
+    if (booking.status === "paid" || booking.status === "confirmed" || booking.payment_status === "approved") {
+      setState((prev) => ({
+        ...prev,
+        step: "confirmed",
+        booking,
+        bookingId: booking.id,
+        checkoutExpiresAt: booking.checkout_expires_at,
+        totalHours: booking.total_hours,
+        totalCharged: booking.total_charged,
+        hostPayout: booking.host_payout,
+        platformFee: booking.platform_fee,
+        ticketInstructions: null,
+        error: null,
+      }));
+      return;
+    }
 
-  // Limpiar suscripciÃƒÂ³n al desmontar
+    if (booking.status === "cancelled") {
+      setState((prev) => ({
+        ...prev,
+        step: "cancelled",
+        booking,
+        bookingId: booking.id,
+        error: booking.payment_error ?? null,
+      }));
+      return;
+    }
+
+    if (booking.payment_method_type === "ticket" && booking.payment_status === "pending") {
+      setState((prev) => ({
+        ...prev,
+        step: "awaiting_offline_payment",
+        booking,
+        bookingId: booking.id,
+        checkoutExpiresAt: booking.checkout_expires_at,
+        ticketInstructions: getTicketInstructions(booking),
+        error: null,
+      }));
+      return;
+    }
+
+    setState((prev) => ({
+      ...prev,
+      step: "payment_ready",
+      booking,
+      bookingId: booking.id,
+      checkoutExpiresAt: booking.checkout_expires_at,
+      totalHours: booking.total_hours,
+      totalCharged: booking.total_charged,
+      hostPayout: booking.host_payout,
+      platformFee: booking.platform_fee,
+      error: booking.payment_status === "rejected"
+        ? humanizePaymentError(booking.payment_error)
+        : null,
+    }));
+  }, []);
+
+  const attachRealtime = useCallback((bookingId: string) => {
+    subscriptionRef.current?.unsubscribe();
+    subscriptionRef.current = subscribeToBooking(bookingId, (updatedBooking) => {
+      syncFromBooking(updatedBooking);
+    });
+  }, [syncFromBooking]);
+
   useEffect(() => {
     return () => {
       subscriptionRef.current?.unsubscribe();
     };
   }, []);
 
-  /**
-   * Calcula el precio estimado antes de iniciar el pago.
-   * ÃƒÅ¡til para mostrar el resumen en el UI antes de confirmar.
-   */
-  const calculatePrice = useCallback((
-    pricePerHour: number,
-    startTime:    string,
-    endTime:      string
-  ) => {
-    const TAKE_RATE = parseFloat(import.meta.env.VITE_TAKE_RATE ?? "0.15");
-
+  const calculatePrice = useCallback((pricePerHour: number, startTime: string, endTime: string) => {
+    const takeRate = parseFloat(import.meta.env.VITE_TAKE_RATE ?? "0.15");
     const [startH, startM] = startTime.split(":").map(Number);
-    const [endH, endM]     = endTime.split(":").map(Number);
-    const totalHours       = ((endH * 60 + endM) - (startH * 60 + startM)) / 60;
+    const [endH, endM] = endTime.split(":").map(Number);
+    const totalHours = ((endH * 60 + endM) - (startH * 60 + startM)) / 60;
 
     if (totalHours <= 0) return null;
 
-    const subtotal    = Math.round(pricePerHour * totalHours);
-    const platformFee = Math.round(subtotal * TAKE_RATE);
+    const subtotal = Math.round(pricePerHour * totalHours);
+    const platformFee = Math.round(subtotal * takeRate);
     const totalCharged = subtotal + platformFee;
-    const hostPayout   = subtotal - Math.round(subtotal * TAKE_RATE);
+    const hostPayout = subtotal - platformFee;
 
     return { totalHours, subtotal, platformFee, totalCharged, hostPayout };
   }, []);
 
-  /**
-   * Inicia el flujo de reserva:
-   * 1. Valida que el usuario estÃƒÂ¡ autenticado
-   * 2. Crea la preferencia de pago en MercadoPago
-   * 3. Redirige al usuario a MP o abre el checkout
-   */
   const startReservation = useCallback(async (form: ReservationForm) => {
-    setState(prev => ({ ...prev, step: "validating", error: null }));
+    setState((prev) => ({ ...prev, step: "preparing_checkout", error: null, ticketInstructions: null }));
 
     try {
-      // Verificar autenticaciÃƒÂ³n
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        setState(prev => ({ ...prev, step: "error", error: "DebÃƒÂ©s iniciar sesiÃƒÂ³n para hacer una reserva" }));
+        setState((prev) => ({
+          ...prev,
+          step: "idle",
+          error: "Debes iniciar sesion para reservar este espacio.",
+        }));
         return;
       }
 
-      setState(prev => ({ ...prev, step: "creating_preference" }));
-
-      // Llamar a la Edge Function
       const { data, error } = await supabase.functions.invoke("mp-create-preference", {
         body: { bookingData: form },
       });
 
-      if (error || !data?.preferenceId) {
-        throw new Error(data?.error ?? error?.message ?? "Error creando preferencia de pago");
+      if (error || !data?.bookingId) {
+        throw new Error(data?.error ?? error?.message ?? "No se pudo preparar el checkout");
       }
 
-      const { preferenceId, initPoint, sandboxInitPoint } = data;
+      const booking = await getBookingById(data.bookingId);
+      if (!booking) throw new Error("No se pudo cargar la reserva creada");
 
-      // Determinar si usamos sandbox o producciÃƒÂ³n
+      attachRealtime(booking.id);
+
       const mpUrl = import.meta.env.DEV
-        ? (sandboxInitPoint ?? initPoint)
-        : initPoint;
+        ? (data.sandboxInitPoint ?? data.initPoint)
+        : data.initPoint;
 
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
-        step:         "redirecting_to_mp",
-        preferenceId,
-        mpInitPoint:  mpUrl,
+        step: "payment_ready",
+        booking,
+        bookingId: booking.id,
+        preferenceId: data.preferenceId,
+        mpInitPoint: mpUrl,
+        checkoutExpiresAt: data.expiresAt ?? booking.checkout_expires_at,
+        totalHours: booking.total_hours,
+        totalCharged: booking.total_charged,
+        hostPayout: booking.host_payout,
+        platformFee: booking.platform_fee,
+        error: null,
       }));
-
-      // Suscribirse a cambios en tiempo real de la reserva
-      subscriptionRef.current = subscribeToBookingStatus(preferenceId, (updatedBooking) => {
-        if (updatedBooking.status === "paid" || updatedBooking.status === "confirmed") {
-          setState(prev => ({
-            ...prev,
-            step:         "confirmed",
-            booking:      updatedBooking,
-            totalCharged: updatedBooking.total_charged,
-            hostPayout:   updatedBooking.host_payout,
-            platformFee:  updatedBooking.platform_fee,
-          }));
-          subscriptionRef.current?.unsubscribe();
-        } else if (updatedBooking.status === "cancelled") {
-          setState(prev => ({ ...prev, step: "cancelled" }));
-        }
-      });
-
-      // Redirigir a MercadoPago
-      window.location.href = mpUrl;
-
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Error desconocido";
-      setState(prev => ({ ...prev, step: "error", error: errorMsg }));
+      setState((prev) => ({
+        ...prev,
+        step: "idle",
+        error: err instanceof Error ? err.message : "No se pudo preparar el checkout",
+      }));
     }
-  }, []);
+  }, [attachRealtime]);
 
-  /**
-   * Verifica el estado de una reserva por preferenceId.
-   * Llamar desde la pÃƒÂ¡gina de retorno de MP (back_url).
-   */
-  const checkPaymentStatus = useCallback(async (preferenceId: string) => {
-    setState(prev => ({ ...prev, step: "waiting_payment", preferenceId }));
+  const submitEmbeddedPayment = useCallback(async (payload: EmbeddedPaymentPayload) => {
+    if (!state.bookingId) {
+      setState((prev) => ({ ...prev, error: "Primero debes preparar la reserva." }));
+      return;
+    }
+
+    setState((prev) => ({ ...prev, step: "processing_payment", error: null }));
 
     try {
-      const { data: booking } = await supabase
-        .from("bookings")
-        .select("*")
-        .eq("mp_preference_id", preferenceId)
-        .maybeSingle();
+      const submissionId = globalThis.crypto?.randomUUID?.()
+        ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-      if (!booking) {
-        // AÃƒÂºn no procesado Ã¢â‚¬â€ esperar con polling
-        startPolling(preferenceId);
-        return;
-      }
+      const { data, error } = await supabase.functions.invoke("mp-process-payment", {
+        body: {
+          bookingId: state.bookingId,
+          submissionId,
+          ...payload,
+        },
+      });
 
-      if (booking.status === "paid" || booking.status === "confirmed") {
-        setState(prev => ({
-          ...prev,
-          step:         "confirmed",
-          booking,
-          totalCharged: booking.total_charged,
-          platformFee:  booking.platform_fee,
-          hostPayout:   booking.host_payout,
-        }));
-      } else if (booking.status === "cancelled") {
-        setState(prev => ({ ...prev, step: "cancelled" }));
-      } else {
-        startPolling(preferenceId);
-      }
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
+      const nextBooking = data?.booking ?? await getBookingById(state.bookingId);
+      if (!nextBooking) throw new Error("No se pudo validar el estado del pago");
+
+      syncFromBooking(nextBooking);
     } catch (err) {
-      setState(prev => ({ ...prev, step: "error", error: "Error verificando el pago" }));
+      setState((prev) => ({
+        ...prev,
+        step: "payment_ready",
+        error: humanizePaymentError(err instanceof Error ? err.message : "No se pudo procesar el pago"),
+      }));
     }
-  }, []);
+  }, [state.bookingId, syncFromBooking]);
 
-  /**
-   * Polling como fallback si el realtime no funciona.
-   * Reintentos cada 3 segundos, mÃƒÂ¡ximo 20 veces (1 minuto).
-   */
-  const startPolling = useCallback((preferenceId: string) => {
-    let attempts = 0;
-    const MAX_ATTEMPTS = 20;
+  const openMercadoPagoWallet = useCallback(() => {
+    if (!state.mpInitPoint) {
+      setState((prev) => ({
+        ...prev,
+        error: "No pudimos iniciar Mercado Pago para esta reserva.",
+      }));
+      return;
+    }
 
-    const poll = async () => {
-      attempts++;
-      if (attempts > MAX_ATTEMPTS) {
-        setState(prev => ({
-          ...prev,
-          step:  "error",
-          error: "El pago tardÃƒÂ³ demasiado en confirmarse. Si ya pagaste, contactanos.",
-        }));
-        return;
-      }
+    setState((prev) => ({ ...prev, step: "awaiting_confirmation", error: null }));
+    window.location.href = state.mpInitPoint;
+  }, [state.mpInitPoint]);
 
-      try {
-        const { data: booking } = await supabase
-          .from("bookings")
-          .select("*")
-          .eq("mp_preference_id", preferenceId)
-          .in("status", ["paid", "confirmed"])
-          .maybeSingle();
-
-        if (booking) {
-          setState(prev => ({
-            ...prev,
-            step:    "confirmed",
-            booking,
-          }));
-          return; // Detener polling
-        }
-
-        // Reintentar
-        setTimeout(poll, 3000);
-
-      } catch {
-        setTimeout(poll, 3000);
-      }
-    };
-
-    setTimeout(poll, 2000); // Primera verificaciÃƒÂ³n a los 2 segundos
-  }, []);
-
-  /**
-   * Cancela una reserva y solicita reembolso si aplica.
-   */
   const cancelBooking = useCallback(async (bookingId: string) => {
     try {
       const { data, error } = await supabase.functions.invoke("mp-release-payment", {
@@ -255,33 +272,56 @@ export function useReservation() {
       if (data?.error) throw new Error(data.error);
 
       return { refunded: Boolean(data?.refunded) };
-
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : "Error cancelando reserva");
     }
   }, []);
 
+  const discardCheckout = useCallback(async () => {
+    const currentBookingId = state.bookingId;
+    const currentBooking = state.booking;
+
+    if (
+      currentBookingId
+      && currentBooking
+      && currentBooking.status === "pending"
+      && currentBooking.payment_status !== "approved"
+      && currentBooking.payment_status !== "refunded"
+    ) {
+      await cancelBooking(currentBookingId);
+    }
+
+    subscriptionRef.current?.unsubscribe();
+    subscriptionRef.current = null;
+    setState(INITIAL_STATE);
+  }, [cancelBooking, state.booking, state.bookingId]);
+
   const reset = useCallback(() => {
     subscriptionRef.current?.unsubscribe();
-    setState({
-      step:         "idle",
-      booking:      null,
-      preferenceId: null,
-      mpInitPoint:  null,
-      error:        null,
-      totalHours:   0,
-      totalCharged: 0,
-      hostPayout:   0,
-      platformFee:  0,
-    });
+    subscriptionRef.current = null;
+    setState(INITIAL_STATE);
   }, []);
 
   return {
     ...state,
     calculatePrice,
     startReservation,
-    checkPaymentStatus,
+    submitEmbeddedPayment,
+    openMercadoPagoWallet,
     cancelBooking,
+    discardCheckout,
     reset,
   };
+}
+
+function humanizePaymentError(error: string | null | undefined) {
+  const message = (error ?? "").toLowerCase();
+  if (!message) return null;
+  if (message.includes("cc_rejected_insufficient_amount")) return "La tarjeta no tiene saldo suficiente.";
+  if (message.includes("cc_rejected_bad_filled_card_number")) return "Revisa el numero de tarjeta.";
+  if (message.includes("cc_rejected_bad_filled_security_code")) return "Revisa el codigo de seguridad.";
+  if (message.includes("cc_rejected_bad_filled_date")) return "Revisa la fecha de vencimiento.";
+  if (message.includes("cc_rejected_high_risk")) return "El banco rechazo el pago por seguridad. Prueba con otra tarjeta.";
+  if (message.includes("cc_rejected_call_for_authorize")) return "Tu banco requiere autorizacion para este pago.";
+  return error;
 }

@@ -70,7 +70,7 @@ serve(async (req) => {
 
     const pendingTtlMinutes = parseInt(Deno.env.get("BOOKING_PENDING_TTL_MINUTES") ?? "30", 10);
     const checkoutExpiresAt = new Date(Date.now() + pendingTtlMinutes * 60_000).toISOString();
-    const stalePendingCutoff = new Date(Date.now() - pendingTtlMinutes * 60_000).toISOString();
+    const nowIso = new Date().toISOString();
 
     await supabase
       .from("bookings")
@@ -78,14 +78,14 @@ serve(async (req) => {
         status: "cancelled",
         payment_status: "rejected",
         payment_error: "checkout_expired",
-        updated_at: new Date().toISOString(),
+        updated_at: nowIso,
       })
       .eq("space_id", spaceId)
       .eq("date", date)
       .lt("start_time", endTime)
       .gt("end_time", startTime)
       .eq("status", "pending")
-      .lt("created_at", stalePendingCutoff);
+      .lt("checkout_expires_at", nowIso);
 
     const { data: overlappingBooking } = await supabase
       .from("bookings")

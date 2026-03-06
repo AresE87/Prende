@@ -75,10 +75,18 @@ export interface Booking {
   status:               BookingStatus;
   guest_count:          number;
   special_requests:     string | null;
+  payment_provider:     string;
+  checkout_token:       string | null;
+  checkout_expires_at:  string | null;
   mp_preference_id:     string | null;
   mp_payment_id:        string | null;
+  mp_merchant_order_id: string | null;
   mp_disbursement_id:   string | null;
   payment_status:       PaymentStatus;
+  payment_method_id:    string | null;
+  payment_method_type:  string | null;
+  payment_metadata:     Record<string, unknown> | null;
+  payment_error:        string | null;
   payment_released_at:  string | null;
   cancellation_deadline: string;
   created_at:           string;
@@ -288,6 +296,36 @@ export async function getMyBookings(role: "guest" | "host") {
  * SuscripciÃƒÂ³n en tiempo real al estado de un booking.
  * ÃƒÅ¡til para la pÃƒÂ¡gina de confirmaciÃƒÂ³n de pago.
  */
+export async function getBookingById(bookingId: string): Promise<Booking | null> {
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("*")
+    .eq("id", bookingId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
+export function subscribeToBooking(
+  bookingId: string,
+  onUpdate: (booking: Booking) => void
+) {
+  return supabase
+    .channel(`booking-row-${bookingId}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "UPDATE",
+        schema: "public",
+        table: "bookings",
+        filter: `id=eq.${bookingId}`,
+      },
+      (payload) => onUpdate(payload.new as Booking)
+    )
+    .subscribe();
+}
+
 export function subscribeToBookingStatus(
   bookingPreferenceId: string,
   onUpdate: (booking: Booking) => void

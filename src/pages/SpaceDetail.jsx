@@ -253,7 +253,7 @@ export default function SpaceDetail() {
                 <div>
                   <p className="font-semibold text-[#1C1917] text-sm font-['Inter'] mb-1">Reservas seguras con Prende</p>
                   <p className="text-xs text-[#1C1917]/60 leading-relaxed font-['Inter']">
-                    Pagos protegidos, validaciÃ³n de reserva en backend y confirmaciÃ³n automÃ¡tica al acreditarse el pago.
+                    Tarjetas, Mercado Pago y redes locales con validacion en backend y confirmacion automatica al acreditarse el pago.
                   </p>
                 </div>
               </div>
@@ -273,7 +273,6 @@ export default function SpaceDetail() {
                 minHours={normalized.min_hours}
                 maxGuests={normalized.max_guests}
                 spaceName={normalized.title}
-                onConfirmed={() => navigate("/mis-reservas")}
               />
             </Card>
           </div>
