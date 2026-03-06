@@ -1,269 +1,294 @@
-import { useEffect, useRef, useState } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+﻿import { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Activity, CalendarDays, CheckCircle2, MapPin, Sparkles } from "lucide-react";
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger);
 
-/* ========== Feature 1: Map ========== */
+const MAP_PINS = [
+  { label: "Pocitos", price: "desde $800/h", x: "40%", y: "58%" },
+  { label: "Punta Carretas", price: "desde $1.200/h", x: "24%", y: "42%" },
+  { label: "Carrasco", price: "desde $1.500/h", x: "74%", y: "28%" },
+  { label: "Buceo", price: "desde $980/h", x: "55%", y: "46%" },
+];
+
+const WEEK_DAYS = ["L", "M", "X", "J", "V", "S", "D"];
+const TIME_SLOTS = ["10:00", "13:00", "16:00", "19:00"];
+const TERMINAL_LINES = [
+  "Buscando espacios cerca de Pocitos...",
+  "3 barbacoas disponibles este sabado...",
+  "Comparando precios y capacidades...",
+  "Checkout validado y reserva preparada.",
+];
+
 function MapFeature() {
-  const ref = useRef(null)
-
-  const pins = [
-    { label: 'Pocitos', price: 'desde $800/h', x: '35%', y: '55%' },
-    { label: 'Punta Carretas', price: 'desde $1.200/h', x: '25%', y: '42%' },
-    { label: 'Carrasco', price: 'desde $1.500/h', x: '70%', y: '35%' },
-  ]
+  const ref = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from('.map-pin', {
-        scale: 0,
+      gsap.from(".map-feature-node", {
+        scale: 0.7,
         opacity: 0,
-        duration: 0.5,
-        stagger: 0.2,
-        ease: 'back.out(1.7)',
-        scrollTrigger: { trigger: ref.current, start: 'top 75%' },
-      })
-    }, ref)
-    return () => ctx.revert()
-  }, [])
+        y: 18,
+        duration: 0.65,
+        stagger: 0.12,
+        ease: "power3.out",
+        scrollTrigger: { trigger: ref.current, start: "top 76%" },
+      });
+    }, ref);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <div ref={ref} className="relative bg-carbon rounded-3xl p-8 overflow-hidden min-h-[340px]">
-      {/* Fake map background grid */}
-      <div className="absolute inset-0 opacity-10">
-        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#F5F0E8" strokeWidth="0.5" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
-      </div>
+    <article
+      ref={ref}
+      className="surface-card surface-card-hover relative overflow-hidden rounded-[40px] px-6 py-6 sm:px-8 sm:py-8 lg:min-h-[520px]"
+    >
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(200,216,232,0.38),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(213,99,42,0.14),transparent_28%),linear-gradient(180deg,rgba(255,253,248,0.96)_0%,rgba(246,239,229,0.84)_100%)]" />
+      <div
+        className="absolute inset-0 opacity-[0.3]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(35,29,25,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(35,29,25,0.05) 1px, transparent 1px)",
+          backgroundSize: "42px 42px",
+        }}
+      />
+      <div className="absolute -right-12 bottom-0 h-56 w-56 rounded-full bg-[#d5632a]/10 blur-3xl" />
 
-      {/* Coastline hint */}
-      <svg className="absolute inset-0 w-full h-full opacity-10" viewBox="0 0 400 300" preserveAspectRatio="none">
-        <path d="M0,200 Q100,150 200,180 Q300,210 400,160 L400,300 L0,300 Z" fill="#4A5E3A" />
-      </svg>
-
-      {/* Pins */}
-      {pins.map((pin, i) => (
-        <div
-          key={i}
-          className="map-pin absolute flex flex-col items-center"
-          style={{ left: pin.x, top: pin.y }}
-        >
-          {/* Pulse ring */}
-          <span className="absolute w-8 h-8 rounded-full bg-brasa/20 animate-ping" />
-          {/* Pin dot */}
-          <span className="relative w-4 h-4 rounded-full bg-brasa shadow-lg shadow-brasa/30" />
-          {/* Label */}
-          <div className="mt-2 bg-white/10 backdrop-blur-sm rounded-xl px-3 py-1.5 whitespace-nowrap">
-            <p className="font-jakarta text-xs font-semibold text-crema">{pin.label}</p>
-            <p className="font-mono text-[10px] text-crema/50">{pin.price}</p>
+      <div className="relative z-10 flex h-full flex-col">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#231d19]/38">Exploracion visual</p>
+            <h3 className="mt-3 text-3xl font-semibold leading-tight text-[#231d19] sm:text-[2.1rem]">
+              Un mapa que se siente parte del producto, no un placeholder tecnico.
+            </h3>
+          </div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#231d19]/8 bg-white/78 px-4 py-2 text-xs font-medium text-[#231d19]/66 shadow-[0_16px_32px_-28px_rgba(73,52,40,0.24)]">
+            <MapPin size={14} className="text-[#d5632a]" />
+            4 zonas activas
           </div>
         </div>
-      ))}
 
-      {/* Title overlay */}
-      <div className="relative z-10">
-        <span className="font-mono text-[10px] text-crema/30 tracking-widest uppercase">
-          Feature
-        </span>
-        <h3 className="font-jakarta font-bold text-xl text-crema mt-1">Mapa de espacios</h3>
-        <p className="font-inter text-sm text-crema/40 mt-2 max-w-[200px]">
-          Explorá por zona y encontrá el espacio ideal cerca tuyo.
+        <p className="mt-4 max-w-xl text-sm leading-relaxed text-[#231d19]/58 sm:text-base">
+          En vez de tres bloques oscuros iguales, este panel abre la seccion con una pieza mas aireada, geografica y premium.
         </p>
-      </div>
-    </div>
-  )
-}
 
-/* ========== Feature 2: Availability Calendar ========== */
-function AvailabilityFeature() {
-  const ref = useRef(null)
-  const [selectedDay, setSelectedDay] = useState(null)
-  const [confirmed, setConfirmed] = useState(false)
+        <div className="relative mt-8 flex-1 overflow-hidden rounded-[32px] border border-[#231d19]/8 bg-[linear-gradient(180deg,rgba(247,243,234,0.96)_0%,rgba(239,232,219,0.82)_100%)] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
+          <svg className="absolute inset-0 h-full w-full opacity-[0.42]" viewBox="0 0 640 420" preserveAspectRatio="none">
+            <path d="M-20 285 C 72 210, 176 195, 252 222 C 334 251, 416 246, 470 216 C 524 186, 588 180, 680 230 L 680 420 L -20 420 Z" fill="rgba(95,111,82,0.12)" />
+            <path d="M-10 320 C 110 254, 188 242, 276 266 C 354 287, 448 286, 542 248 C 596 225, 636 218, 690 245" fill="none" stroke="rgba(35,29,25,0.08)" strokeWidth="2" strokeDasharray="6 10" />
+          </svg>
 
-  const days = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
+          <div className="absolute right-5 top-5 rounded-[26px] border border-[#231d19]/8 bg-white/82 px-4 py-3 shadow-[0_20px_34px_-28px_rgba(73,52,40,0.22)] backdrop-blur-sm">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-[#231d19]/36">Curaduria</p>
+            <p className="mt-1 text-sm font-semibold text-[#231d19]">Espacios bien presentados por zona</p>
+          </div>
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        scrollTrigger: { trigger: ref.current, start: 'top 75%' },
-        delay: 0.5,
-      })
-
-      tl.to({}, {
-        duration: 0.8,
-        onComplete: () => setSelectedDay(5), // Saturday
-      })
-        .to({}, {
-          duration: 0.6,
-          onComplete: () => setConfirmed(true),
-        })
-    }, ref)
-    return () => ctx.revert()
-  }, [])
-
-  return (
-    <div ref={ref} className="relative bg-carbon rounded-3xl p-8 overflow-hidden min-h-[340px]">
-      <span className="font-mono text-[10px] text-crema/30 tracking-widest uppercase">
-        Feature
-      </span>
-      <h3 className="font-jakarta font-bold text-xl text-crema mt-1 mb-6">
-        Disponibilidad en vivo
-      </h3>
-
-      {/* Calendar grid */}
-      <div className="grid grid-cols-7 gap-2 mb-6">
-        {days.map((day, i) => (
-          <div key={i} className="text-center">
-            <span className="font-mono text-[10px] text-crema/30 block mb-2">{day}</span>
+          {MAP_PINS.map((pin, index) => (
             <div
-              className={`w-full aspect-square rounded-xl flex items-center justify-center transition-all duration-500 ${
-                selectedDay === i
-                  ? 'bg-brasa text-crema scale-105 shadow-lg shadow-brasa/20'
-                  : i === 6
-                    ? 'bg-white/[0.03] text-crema/20'
-                    : 'bg-white/[0.03] text-crema/30'
-              }`}
+              key={pin.label}
+              className="map-feature-node absolute"
+              style={{ left: pin.x, top: pin.y }}
             >
-              <span className="font-mono text-xs">{10 + i}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Time slots */}
-      <div className="flex gap-2 mb-6">
-        {['10:00', '13:00', '16:00', '19:00'].map((t, i) => (
-          <div
-            key={t}
-            className={`flex-1 py-2 rounded-xl text-center font-mono text-xs transition-all duration-500 ${
-              i === 2 && selectedDay !== null
-                ? 'bg-brasa/20 text-brasa border border-brasa/30'
-                : 'bg-white/[0.03] text-crema/20'
-            }`}
-          >
-            {t}
-          </div>
-        ))}
-      </div>
-
-      {/* Confirm button */}
-      <button
-        className={`w-full py-3 rounded-xl font-jakarta font-semibold text-sm transition-all duration-500 ${
-          confirmed
-            ? 'bg-brasa text-crema shadow-lg shadow-brasa/20'
-            : 'bg-white/[0.06] text-crema/30'
-        }`}
-      >
-        {confirmed ? '✓ Reserva confirmada' : 'Confirmar reserva'}
-      </button>
-    </div>
-  )
-}
-
-/* ========== Feature 3: Telemetry ========== */
-function TelemetryFeature() {
-  const ref = useRef(null)
-  const [lineIndex, setLineIndex] = useState(0)
-
-  const lines = [
-    'Buscando espacios cerca de Pocitos…',
-    '3 barbacoas disponibles este sábado…',
-    'Comparando precios y capacidades…',
-    'Reserva confirmada. ¡A prender el fuego!',
-  ]
-
-  useEffect(() => {
-    let mounted = true
-    const cycle = () => {
-      if (!mounted) return
-      setLineIndex((prev) => (prev + 1) % lines.length)
-    }
-    const interval = setInterval(cycle, 2500)
-    return () => {
-      mounted = false
-      clearInterval(interval)
-    }
-  }, [])
-
-  return (
-    <div ref={ref} className="relative bg-carbon rounded-3xl p-8 overflow-hidden min-h-[340px] flex flex-col">
-      <div className="flex items-center gap-3 mb-6">
-        <span className="font-mono text-[10px] text-crema/30 tracking-widest uppercase">
-          Feature
-        </span>
-        <div className="flex items-center gap-2 ml-auto">
-          <span className="w-2 h-2 rounded-full bg-oliva animate-pulse" />
-          <span className="font-mono text-[10px] text-oliva">En vivo</span>
-        </div>
-      </div>
-
-      <h3 className="font-jakarta font-bold text-xl text-crema mb-6">
-        Telemetría de reservas
-      </h3>
-
-      {/* Terminal */}
-      <div className="flex-1 bg-black/30 rounded-2xl p-5 font-mono text-sm">
-        <div className="flex items-center gap-2 mb-4">
-          <span className="w-3 h-3 rounded-full bg-red-500/60" />
-          <span className="w-3 h-3 rounded-full bg-yellow-500/60" />
-          <span className="w-3 h-3 rounded-full bg-green-500/60" />
-        </div>
-
-        <div className="space-y-2">
-          {lines.slice(0, lineIndex + 1).map((line, i) => (
-            <div key={i} className="flex items-start gap-2">
-              <span className="text-brasa/60 select-none">›</span>
-              <span
-                className={`${
-                  i === lineIndex ? 'text-crema' : 'text-crema/30'
-                } transition-colors duration-300`}
-              >
-                {line}
-              </span>
+              <span className="absolute left-1/2 top-1/2 h-12 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#d5632a]/12 blur-xl" />
+              <span className="absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#d5632a]/20 bg-[#d5632a]/12 animate-pulse" />
+              <span className="relative block h-4 w-4 rounded-full bg-[#d5632a] shadow-[0_10px_22px_-8px_rgba(213,99,42,0.88)]" />
+              <div className={`mt-3 rounded-[22px] border border-[#231d19]/8 bg-white/84 px-4 py-3 shadow-[0_20px_34px_-28px_rgba(73,52,40,0.22)] backdrop-blur-sm ${index % 2 === 0 ? "translate-x-0" : "-translate-x-8"}`}>
+                <p className="text-sm font-semibold text-[#231d19]">{pin.label}</p>
+                <p className="mt-1 font-mono text-xs text-[#231d19]/46">{pin.price}</p>
+              </div>
             </div>
           ))}
-          {/* Cursor */}
-          <div className="flex items-center gap-2">
-            <span className="text-brasa/60 select-none">›</span>
-            <span className="w-2 h-4 bg-brasa animate-pulse" />
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function AvailabilityFeature() {
+  const ref = useRef(null);
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [confirmed, setConfirmed] = useState(false);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const timeline = gsap.timeline({
+        scrollTrigger: { trigger: ref.current, start: "top 80%" },
+      });
+
+      timeline
+        .to({}, { duration: 0.45, onComplete: () => setSelectedDay(5) })
+        .to({}, { duration: 0.35, onComplete: () => setSelectedSlot("16:00") })
+        .to({}, { duration: 0.4, onComplete: () => setConfirmed(true) });
+    }, ref);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <article
+      ref={ref}
+      className="surface-card surface-card-hover relative overflow-hidden rounded-[40px] px-6 py-6 sm:px-8 sm:py-8"
+    >
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(213,99,42,0.18),transparent_28%),linear-gradient(180deg,rgba(255,248,242,0.94)_0%,rgba(248,238,228,0.88)_100%)]" />
+      <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent" />
+
+      <div className="relative z-10">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#231d19]/38">Disponibilidad</p>
+            <h3 className="mt-3 text-2xl font-semibold leading-tight text-[#231d19] sm:text-[2rem]">
+              Fechas y horarios con una lectura mucho mas clara.
+            </h3>
+          </div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#d5632a]/16 bg-[#fff0e7] px-4 py-2 text-xs font-medium text-[#b75a2f]">
+            <CalendarDays size={14} />
+            En vivo
+          </div>
+        </div>
+
+        <div className="mt-6 rounded-[30px] border border-[#231d19]/8 bg-white/76 p-5 shadow-[0_22px_34px_-28px_rgba(73,52,40,0.18)] backdrop-blur-sm">
+          <div className="grid grid-cols-7 gap-2">
+            {WEEK_DAYS.map((day, index) => {
+              const active = selectedDay === index;
+              const muted = index === 6;
+
+              return (
+                <div key={day} className="text-center">
+                  <span className="mb-2 block text-[11px] uppercase tracking-[0.18em] text-[#231d19]/34">{day}</span>
+                  <div
+                    className={`rounded-[18px] px-2 py-4 text-sm font-medium transition-all duration-500 ${active ? "bg-[linear-gradient(135deg,#de8355_0%,#c86534_100%)] text-white shadow-[0_16px_28px_-18px_rgba(213,99,42,0.52)]" : muted ? "bg-[#231d19]/4 text-[#231d19]/26" : "bg-[#231d19]/4 text-[#231d19]/54"}`}
+                  >
+                    {10 + index}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {TIME_SLOTS.map((slot) => {
+              const active = selectedSlot === slot;
+              return (
+                <div
+                  key={slot}
+                  className={`rounded-[18px] border px-4 py-3 text-center font-mono text-sm transition-all duration-500 ${active ? "border-[#d5632a]/24 bg-[#fff1e8] text-[#c55f31] shadow-[0_12px_26px_-20px_rgba(213,99,42,0.44)]" : "border-[#231d19]/8 bg-white/66 text-[#231d19]/42"}`}
+                >
+                  {slot}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className={`mt-5 flex items-center justify-center gap-2 rounded-[20px] px-4 py-4 text-sm font-semibold transition-all duration-500 ${confirmed ? "bg-[linear-gradient(135deg,#f0c4a7_0%,#d68b5c_100%)] text-[#4a2412] shadow-[0_18px_34px_-24px_rgba(213,99,42,0.42)]" : "bg-[#231d19]/5 text-[#231d19]/35"}`}>
+            <CheckCircle2 size={16} />
+            {confirmed ? "Reserva confirmada" : "Esperando seleccion"}
           </div>
         </div>
       </div>
-    </div>
-  )
+    </article>
+  );
 }
 
-/* ========== Main Features Section ========== */
-export default function Features() {
-  const sectionRef = useRef(null)
+function TelemetryFeature() {
+  const ref = useRef(null);
+  const [lineIndex, setLineIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLineIndex((prev) => (prev + 1) % TERMINAL_LINES.length);
+    }, 2400);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <section ref={sectionRef} id="espacios" className="bg-cream py-24 sm:py-32">
-      <div className="max-w-6xl mx-auto px-6 sm:px-8">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <span className="inline-block font-mono text-xs font-medium text-carbon/30 tracking-widest uppercase mb-4">
-            Paneles funcionales
-          </span>
-          <h2 className="font-jakarta font-bold text-3xl sm:text-4xl md:text-5xl text-carbon tracking-tight">
-            No te contamos.{' '}
-            <span className="font-cormorant italic text-brasa">Te mostramos.</span>
-          </h2>
+    <article
+      ref={ref}
+      className="relative overflow-hidden rounded-[40px] border border-[#231d19]/12 bg-[linear-gradient(135deg,#231d19_0%,#151210_100%)] px-6 py-6 text-[#f8f3ea] shadow-[0_26px_56px_-40px_rgba(35,29,25,0.42)] sm:px-8 sm:py-8"
+    >
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(213,99,42,0.18),transparent_22%)]" />
+      <div
+        className="absolute inset-0 opacity-[0.08]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)",
+          backgroundSize: "26px 26px",
+        }}
+      />
+
+      <div className="relative z-10">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/34">Telemetria</p>
+            <h3 className="mt-3 text-2xl font-semibold leading-tight text-white sm:text-[2rem]">
+              Un panel oscuro, pero mucho mas controlado y elegante.
+            </h3>
+          </div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#5f6f52]/18 bg-[#5f6f52]/16 px-4 py-2 text-xs font-medium text-[#d9ead0]">
+            <Activity size={14} />
+            En vivo
+          </div>
         </div>
 
-        {/* Features grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <MapFeature />
-          <AvailabilityFeature />
-          <TelemetryFeature />
+        <div className="mt-6 rounded-[30px] border border-white/8 bg-black/18 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-md">
+          <div className="flex items-center gap-2">
+            <span className="h-3 w-3 rounded-full bg-[#d75d5d]" />
+            <span className="h-3 w-3 rounded-full bg-[#c9a02f]" />
+            <span className="h-3 w-3 rounded-full bg-[#4e9e67]" />
+            <span className="ml-auto text-[11px] uppercase tracking-[0.2em] text-white/28">Sesion activa</span>
+          </div>
+
+          <div className="mt-5 space-y-3 font-mono text-[15px] leading-relaxed">
+            {TERMINAL_LINES.slice(0, lineIndex + 1).map((line, index) => (
+              <div key={line} className="flex items-start gap-3">
+                <span className="mt-[2px] text-[#d5632a]">›</span>
+                <span className={index === lineIndex ? "text-white" : "text-white/38"}>{line}</span>
+              </div>
+            ))}
+            <div className="flex items-center gap-3">
+              <span className="text-[#d5632a]">›</span>
+              <span className="h-4 w-2 bg-[#d5632a] animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export default function Features() {
+  return (
+    <section id="espacios" className="bg-transparent py-24 sm:py-32">
+      <div className="mx-auto max-w-6xl px-6 sm:px-8">
+        <div className="section-shell rounded-[46px] px-6 py-8 sm:px-10 sm:py-10">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#231d19]/8 bg-white/76 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.22em] text-[#231d19]/42 shadow-[0_16px_28px_-24px_rgba(73,52,40,0.16)]">
+                <Sparkles size={14} className="text-[#d5632a]" />
+                Paneles funcionales
+              </div>
+              <h2 className="mt-5 font-display text-5xl leading-none text-[#231d19] sm:text-6xl lg:text-7xl">
+                La operacion se siente mejor cuando cada panel tiene un rol propio.
+              </h2>
+            </div>
+
+            <p className="max-w-xl text-sm leading-relaxed text-[#231d19]/58 sm:text-base">
+              Esta seccion ahora evita la repeticion de tres tarjetas negras iguales. Cada bloque responde a una funcion distinta y usa una atmosfera visual acorde a esa funcion.
+            </p>
+          </div>
+
+          <div className="mt-10 grid gap-6 lg:grid-cols-[1.18fr_0.82fr]">
+            <MapFeature />
+            <div className="grid gap-6">
+              <AvailabilityFeature />
+              <TelemetryFeature />
+            </div>
+          </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

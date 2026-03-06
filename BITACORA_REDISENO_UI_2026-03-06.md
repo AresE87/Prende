@@ -208,6 +208,24 @@ Objetivo de este ajuste:
 - dar respuesta visual al mouse sin caer en animaciones exageradas
 - hacer que la UI se sienta mas viva y menos estatica
 
+## Ajuste posterior: seccion de features de landing
+
+Se rehizo la seccion de `src/components/Features.jsx` porque la composicion anterior seguia viendose demasiado rigida y repetitiva.
+
+Problema detectado:
+
+- tres cards oscuras muy parecidas entre si
+- sensacion de bloque \"demo dashboard\"
+- demasiado peso visual negro dentro de una landing ya mas sofisticada
+
+Solucion aplicada:
+
+- nueva composicion editorial con una pieza principal para mapa
+- bloque secundario calido para disponibilidad
+- bloque oscuro reservado solo para telemetria
+- mejor balance entre tonos claros, calidos y profundos
+- menos repeticion y mas identidad por panel
+
 ## Como seguiria yo este rediseño
 
 ### 1. Host flows
