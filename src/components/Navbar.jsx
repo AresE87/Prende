@@ -11,35 +11,46 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
+  const [scrolled, setScrolled] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.scrollY > 32;
+  });
   const [mobileOpen, setMobileOpen] = useState(false);
   const { state, authLoading } = useApp();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 32);
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const showSignedInActions = !authLoading && state.user;
   const showGuestActions = !authLoading && !state.user;
+  const shellClass = scrolled
+    ? "glass-shell shadow-[0_20px_40px_-30px_rgba(73,52,40,0.28)]"
+    : "border border-white/14 bg-[linear-gradient(180deg,rgba(28,24,21,0.52)_0%,rgba(28,24,21,0.34)_100%)] shadow-[0_24px_48px_-34px_rgba(0,0,0,0.72)] backdrop-blur-md";
+  const brandEyebrowClass = scrolled ? "text-[#171616]/38" : "text-white/72";
+  const brandTextClass = scrolled ? "text-[#171616]" : "text-white";
+  const navLinkClass = scrolled ? "text-[#171616]/68 hover:text-[#171616]" : "text-white/92 hover:text-white";
+  const secondaryActionClass = scrolled ? "text-[#171616]/72 hover:text-[#171616]" : "text-white/92 hover:text-white";
 
   return (
     <nav className="fixed left-0 right-0 top-4 z-50 px-4 sm:px-6">
-      <div className={`mx-auto flex max-w-6xl items-center justify-between rounded-full px-4 py-3 transition duration-500 sm:px-5 ${scrolled ? "glass-shell shadow-[0_20px_40px_-30px_rgba(73,52,40,0.28)]" : "bg-transparent"}`}>
+      <div className={`mx-auto flex max-w-6xl items-center justify-between rounded-full px-4 py-3 transition duration-500 sm:px-5 ${shellClass}`}>
         <a href="#" className="subtle-hover flex items-center gap-3 rounded-full px-1 py-1">
           <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#241f1b] text-[#f7f1e8] shadow-[0_16px_26px_-20px_rgba(43,36,31,0.58)]">
             <Flame size={18} />
           </div>
           <div>
-            <p className={`text-[10px] uppercase tracking-[0.18em] ${scrolled ? "text-[#171616]/38" : "text-white/50"}`}>Espacios con parrilla</p>
-            <p className={`text-lg font-semibold ${scrolled ? "text-[#171616]" : "text-white"}`}>Prende</p>
+            <p className={`text-[10px] uppercase tracking-[0.18em] ${brandEyebrowClass}`}>Espacios con parrilla</p>
+            <p className={`text-lg font-semibold ${brandTextClass}`}>Prende</p>
           </div>
         </a>
 
         <div className="hidden items-center gap-6 lg:flex">
           {navLinks.map((link) => (
-            <a key={link.href} href={link.href} className={`text-sm font-medium transition ${scrolled ? "text-[#171616]/68 hover:text-[#171616]" : "text-white/76 hover:text-white"}`}>
+            <a key={link.href} href={link.href} className={`text-sm font-medium transition ${navLinkClass}`}>
               {link.label}
             </a>
           ))}
@@ -48,7 +59,7 @@ export default function Navbar() {
         <div className="hidden items-center gap-3 sm:flex">
           {showSignedInActions ? (
             <>
-              <Link to="/" className={`subtle-hover inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${scrolled ? "text-[#171616]/72 hover:text-[#171616]" : "text-white/82 hover:text-white"}`}>
+              <Link to="/" className={`subtle-hover inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${secondaryActionClass}`}>
                 <LayoutDashboard size={14} />
                 Mi dashboard
               </Link>
@@ -59,7 +70,7 @@ export default function Navbar() {
             </>
           ) : showGuestActions ? (
             <>
-              <Link to="/login" className={`subtle-hover inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${scrolled ? "text-[#171616]/72 hover:text-[#171616]" : "text-white/82 hover:text-white"}`}>
+              <Link to="/login" className={`subtle-hover inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${secondaryActionClass}`}>
                 <User size={14} />
                 Iniciar sesion
               </Link>

@@ -27,7 +27,7 @@ export default function Hero() {
           alt="Personas compartiendo un asado"
           className="h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(35,29,25,0.18)_0%,rgba(35,29,25,0.6)_56%,rgba(35,29,25,0.8)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(18,15,13,0.74)_0%,rgba(25,21,18,0.44)_18%,rgba(35,29,25,0.62)_56%,rgba(35,29,25,0.82)_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(213,99,42,0.2),transparent_24%)]" />
       </div>
 
