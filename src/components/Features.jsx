@@ -15,10 +15,10 @@ const MAP_PINS = [
 const WEEK_DAYS = ["L", "M", "X", "J", "V", "S", "D"];
 const TIME_SLOTS = ["10:00", "13:00", "16:00", "19:00"];
 const TERMINAL_LINES = [
-  "Buscando espacios con parrilla en Pocitos...",
-  "3 barbacoas disponibles este sabado...",
-  "Comparando precios, capacidad y amenities...",
-  "Pago confirmado. Reserva enviada al anfitrion.",
+  "Buscando barbacoas disponibles en Pocitos...",
+  "4 espacios encontrados para 12 personas...",
+  "Reserva enviada al anfitrion y pago en proceso...",
+  "Pago aprobado. Confirmacion lista para tu encuentro.",
 ];
 
 function MapFeature() {
@@ -61,7 +61,7 @@ function MapFeature() {
           <div>
             <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#231d19]/38">Busca por zona</p>
             <h3 className="mt-3 text-3xl font-semibold leading-tight text-[#231d19] sm:text-[2.1rem]">
-              Explora quinchos, barbacoas y terrazas cerca tuyo.
+              Encuentra espacios con parrilla por barrio.
             </h3>
           </div>
           <div className="inline-flex items-center gap-2 rounded-full border border-[#231d19]/8 bg-white/78 px-4 py-2 text-xs font-medium text-[#231d19]/66 shadow-[0_16px_32px_-28px_rgba(73,52,40,0.24)]">
@@ -71,7 +71,7 @@ function MapFeature() {
         </div>
 
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-[#231d19]/58 sm:text-base">
-          Filtra por barrio y compara espacios con parrilla en Pocitos, Punta Carretas, Buceo, Carrasco y otras zonas de Montevideo.
+          Filtra por zona y compara barbacoas, quinchos y terrazas en Pocitos, Punta Carretas, Buceo, Carrasco y otras zonas de Montevideo.
         </p>
 
         <div className="relative mt-8 flex-1 overflow-hidden rounded-[32px] border border-[#231d19]/8 bg-[linear-gradient(180deg,rgba(247,243,234,0.96)_0%,rgba(239,232,219,0.82)_100%)] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
@@ -140,7 +140,7 @@ function AvailabilityFeature() {
           <div>
             <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#231d19]/38">Agenda disponible</p>
             <h3 className="mt-3 text-2xl font-semibold leading-tight text-[#231d19] sm:text-[2rem]">
-              Revisa fechas y horarios antes de confirmar tu reserva.
+              Consulta fechas y horarios disponibles antes de reservar.
             </h3>
           </div>
           <div className="inline-flex items-center gap-2 rounded-full border border-[#d5632a]/16 bg-[#fff0e7] px-4 py-2 text-xs font-medium text-[#b75a2f]">
@@ -224,7 +224,7 @@ function TelemetryFeature() {
           <div>
             <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/34">Seguimiento</p>
             <h3 className="mt-3 text-2xl font-semibold leading-tight text-white sm:text-[2rem]">
-              Sigue el estado de tu reserva en tiempo real.
+              Recibe confirmaciones y seguimiento de tu reserva.
             </h3>
           </div>
           <div className="inline-flex items-center gap-2 rounded-full border border-[#5f6f52]/18 bg-[#5f6f52]/16 px-4 py-2 text-xs font-medium text-[#d9ead0]">
@@ -266,17 +266,17 @@ export default function Features() {
         <div className="section-shell rounded-[46px] px-6 py-8 sm:px-10 sm:py-10">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#231d19]/8 bg-white/76 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.22em] text-[#231d19]/42 shadow-[0_16px_28px_-24px_rgba(73,52,40,0.16)]">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#231d19]/8 bg-white/76 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.22em] text-[#231d19]/42 shadow-[0_16px_28px_-24px_rgba(73,52,40,0.16)]">
                 <Sparkles size={14} className="text-[#d5632a]" />
-                Como funciona Prende
+                Reservas online en Prende
               </div>
               <h2 className="mt-5 font-display text-5xl leading-none text-[#231d19] sm:text-6xl lg:text-7xl">
-                Busca, compara y reserva espacios con parrilla en minutos.
+                Encuentra, compara y reserva espacios con parrilla sin salir de la plataforma.
               </h2>
             </div>
 
             <p className="max-w-xl text-sm leading-relaxed text-[#231d19]/58 sm:text-base">
-              Prende te permite explorar zonas, ver disponibilidad real y confirmar tu reserva online con un flujo claro para invitados y anfitriones.
+              Explora zonas de Montevideo, revisa disponibilidad real y confirma tu reserva online con seguimiento antes y despues del pago.
             </p>
           </div>
 

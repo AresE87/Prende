@@ -1,9 +1,11 @@
-﻿import { useState, useEffect } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Flame, User, ArrowRight } from "lucide-react";
+import { Flame, User, ArrowRight, CalendarDays, LayoutDashboard, Search } from "lucide-react";
+import { useApp } from "../context/AppContext";
+import { getSignedInHome } from "../lib/navigation";
 
 const navLinks = [
-  { label: "Como funciona", href: "#como-funciona" },
+  { label: "Como reservar", href: "#como-funciona" },
   { label: "Espacios", href: "#espacios" },
   { label: "Precios", href: "#precios" },
   { label: "FAQ", href: "#faq" },
@@ -12,12 +14,20 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { state, authLoading } = useApp();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 32);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const signedInHome = getSignedInHome(state.user);
+  const signedInSecondary = state.user?.isHost ? "/anfitrion/dashboard" : "/mis-reservas";
+  const secondaryLabel = state.user?.isHost ? "Mi panel" : "Mis reservas";
+  const SecondaryIcon = state.user?.isHost ? LayoutDashboard : CalendarDays;
+  const showSignedInActions = !authLoading && state.user;
+  const showGuestActions = !authLoading && !state.user;
 
   return (
     <nav className="fixed left-0 right-0 top-4 z-50 px-4 sm:px-6">
@@ -27,7 +37,7 @@ export default function Navbar() {
             <Flame size={18} />
           </div>
           <div>
-            <p className={`text-[10px] uppercase tracking-[0.18em] ${scrolled ? "text-[#171616]/38" : "text-white/50"}`}>Marketplace</p>
+            <p className={`text-[10px] uppercase tracking-[0.18em] ${scrolled ? "text-[#171616]/38" : "text-white/50"}`}>Espacios con parrilla</p>
             <p className={`text-lg font-semibold ${scrolled ? "text-[#171616]" : "text-white"}`}>Prende</p>
           </div>
         </a>
@@ -41,14 +51,31 @@ export default function Navbar() {
         </div>
 
         <div className="hidden items-center gap-3 sm:flex">
-          <Link to="/login" className={`subtle-hover inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${scrolled ? "text-[#171616]/72 hover:text-[#171616]" : "text-white/82 hover:text-white"}`}>
-            <User size={14} />
-            Entrar
-          </Link>
-          <a href="#reserva" className="subtle-hover inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#dc7c4d_0%,#c95f31_100%)] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_34px_-24px_rgba(213,99,42,0.56)] transition hover:bg-[linear-gradient(135deg,#e08a5d_0%,#cd6b41_100%)]">
-            Reservar
-            <ArrowRight size={14} />
-          </a>
+          {showSignedInActions ? (
+            <>
+              <Link to={signedInSecondary} className={`subtle-hover inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${scrolled ? "text-[#171616]/72 hover:text-[#171616]" : "text-white/82 hover:text-white"}`}>
+                <SecondaryIcon size={14} />
+                {secondaryLabel}
+              </Link>
+              <Link to={signedInHome} className="subtle-hover inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#dc7c4d_0%,#c95f31_100%)] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_34px_-24px_rgba(213,99,42,0.56)] transition hover:bg-[linear-gradient(135deg,#e08a5d_0%,#cd6b41_100%)]">
+                <Search size={14} />
+                {state.user.isHost ? "Gestionar espacio" : "Explorar espacios"}
+              </Link>
+            </>
+          ) : showGuestActions ? (
+            <>
+              <Link to="/login" className={`subtle-hover inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${scrolled ? "text-[#171616]/72 hover:text-[#171616]" : "text-white/82 hover:text-white"}`}>
+                <User size={14} />
+                Iniciar sesion
+              </Link>
+              <Link to="/buscar" className="subtle-hover inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#dc7c4d_0%,#c95f31_100%)] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_34px_-24px_rgba(213,99,42,0.56)] transition hover:bg-[linear-gradient(135deg,#e08a5d_0%,#cd6b41_100%)]">
+                Explorar espacios
+                <ArrowRight size={14} />
+              </Link>
+            </>
+          ) : (
+            <div className="h-11 w-[17rem]" />
+          )}
         </div>
 
         <button
@@ -74,13 +101,27 @@ export default function Navbar() {
                   {link.label}
                 </a>
               ))}
-              <Link to="/login" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-[20px] px-4 py-3 text-sm font-medium text-[#171616] transition hover:bg-[#171616]/4">
-                <User size={15} /> Entrar
-              </Link>
-              <a href="#reserva" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-2 rounded-full bg-[#241f1b] px-5 py-3 text-sm font-semibold text-[#f7f1e8] shadow-[0_16px_28px_-20px_rgba(43,36,31,0.56)]">
-                Reservar ahora
-                <ArrowRight size={14} />
-              </a>
+              {showSignedInActions ? (
+                <>
+                  <Link to={signedInSecondary} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-[20px] px-4 py-3 text-sm font-medium text-[#171616] transition hover:bg-[#171616]/4">
+                    <SecondaryIcon size={15} /> {secondaryLabel}
+                  </Link>
+                  <Link to={signedInHome} onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-2 rounded-full bg-[#241f1b] px-5 py-3 text-sm font-semibold text-[#f7f1e8] shadow-[0_16px_28px_-20px_rgba(43,36,31,0.56)]">
+                    <Search size={14} />
+                    {state.user.isHost ? "Gestionar espacio" : "Explorar espacios"}
+                  </Link>
+                </>
+              ) : showGuestActions ? (
+                <>
+                  <Link to="/login" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-[20px] px-4 py-3 text-sm font-medium text-[#171616] transition hover:bg-[#171616]/4">
+                    <User size={15} /> Iniciar sesion
+                  </Link>
+                  <Link to="/buscar" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-2 rounded-full bg-[#241f1b] px-5 py-3 text-sm font-semibold text-[#f7f1e8] shadow-[0_16px_28px_-20px_rgba(43,36,31,0.56)]">
+                    Explorar espacios
+                    <ArrowRight size={14} />
+                  </Link>
+                </>
+              ) : null}
             </div>
           </div>
         </div>

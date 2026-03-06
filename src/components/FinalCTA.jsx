@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -31,12 +31,12 @@ export default function FinalCTA() {
           <Flame className="h-8 w-8 text-[#d5632a]" />
         </div>
 
-        <p className="mt-6 text-[11px] uppercase tracking-[0.22em] text-white/46">Lanzamiento premium</p>
+        <p className="mt-6 text-[11px] uppercase tracking-[0.22em] text-white/46">Reserva online en Montevideo</p>
         <h2 className="mt-4 font-display text-5xl leading-none text-white sm:text-6xl lg:text-7xl">
-          Lleva tu proximo encuentro a una reserva mejor resuelta.
+          Encuentra el espacio ideal y confirma tu fecha hoy.
         </h2>
         <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-white/68 sm:text-base">
-          Explora espacios, paga con medios locales y confirma en una interfaz que ya se siente mucho mas cerca de una plataforma internacional.
+          Desde una barbacoa en Pocitos hasta una terraza en Carrasco, Prende reune busqueda, disponibilidad y reserva online en un solo flujo.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -50,9 +50,9 @@ export default function FinalCTA() {
         </div>
 
         <div className="mt-10 grid gap-3 sm:grid-cols-3">
-          <Stat text="Checkout embebido y fallback wallet" />
-          <Stat text="Arquitectura lista para produccion" />
-          <Stat text="Operativa segura con trazabilidad" icon />
+          <Stat text="Espacios por zona, capacidad y precio" />
+          <Stat text="Fechas disponibles antes de reservar" />
+          <Stat text="Confirmacion y seguimiento desde tu cuenta" icon />
         </div>
       </div>
     </section>

@@ -1,11 +1,13 @@
-﻿import { createElement, useState } from "react";
+﻿import { createElement, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Flame, Eye, EyeOff, ArrowRight, ShieldCheck, Sparkles, Building2 } from "lucide-react";
 import { Button, Input, Divider, Card, Badge } from "../../components/shared";
-import { signUpWithEmail, signInWithEmail, signInWithGoogle, supabaseConfigured } from "../../lib/supabase";
+import { getProfile, signUpWithEmail, signInWithEmail, signInWithGoogle, supabaseConfigured } from "../../lib/supabase";
+import { useApp } from "../../context/AppContext";
+import { getSignedInHome } from "../../lib/navigation";
 
 const loginSchema = z.object({
   email: z.string().email("Email invalido"),
@@ -23,6 +25,7 @@ const registerSchema = loginSchema.extend({
 export default function Login() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { state, authLoading } = useApp();
 
   const [mode, setMode] = useState(searchParams.get("mode") === "register" ? "register" : "login");
   const [showPass, setShowPass] = useState(false);
@@ -33,11 +36,27 @@ export default function Login() {
 
   const schema = mode === "login" ? loginSchema : registerSchema;
   const { register, handleSubmit, formState: { errors }, reset } = useForm({ resolver: zodResolver(schema) });
+  const signedInRoute = useMemo(() => getSignedInHome(state.user), [state.user]);
+
+  useEffect(() => {
+    if (!authLoading && state.user && !confirmEmail) {
+      navigate(signedInRoute, { replace: true });
+    }
+  }, [authLoading, confirmEmail, navigate, signedInRoute, state.user]);
 
   function switchMode() {
     setMode((current) => (current === "login" ? "register" : "login"));
     setError(null);
     reset();
+  }
+
+  async function resolveSignedInRoute(userId, fallbackIsHost = false) {
+    try {
+      const profile = await getProfile(userId);
+      return getSignedInHome({ isHost: Boolean(profile?.is_host ?? fallbackIsHost) });
+    } catch {
+      return getSignedInHome({ isHost: fallbackIsHost });
+    }
   }
 
   async function onSubmit(data) {
@@ -59,10 +78,13 @@ export default function Login() {
           return;
         }
 
-        navigate(asHost ? "/anfitrion/onboarding" : "/");
+        navigate(asHost ? "/anfitrion/onboarding" : "/buscar", { replace: true });
       } else {
-        await signInWithEmail(data.email, data.password);
-        navigate("/");
+        const result = await signInWithEmail(data.email, data.password);
+        const nextRoute = result.user
+          ? await resolveSignedInRoute(result.user.id)
+          : "/buscar";
+        navigate(nextRoute, { replace: true });
       }
     } catch (err) {
       const msg = err.message || "Error al procesar la solicitud";
@@ -120,7 +142,7 @@ export default function Login() {
       <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[minmax(0,1.05fr)_520px]">
         <section className="section-shell flex rounded-[40px] px-6 py-8 sm:px-8 sm:py-10">
           <div className="my-auto max-w-2xl">
-            <Badge variant="brasa">Acceso premium</Badge>
+            <Badge variant="brasa">Tu cuenta Prende</Badge>
             <div className="mt-6 inline-flex items-center gap-3 rounded-full border border-[#171616]/10 bg-white/75 px-4 py-3 shadow-[0_16px_28px_-24px_rgba(23,22,22,0.65)]">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#171616] text-[#f7f1e8] shadow-[0_16px_24px_-18px_rgba(23,22,22,0.82)]">
                 <Flame size={18} />
@@ -131,15 +153,15 @@ export default function Login() {
               </div>
             </div>
             <h1 className="mt-6 font-display text-5xl leading-none text-[#171616] sm:text-6xl lg:text-7xl">
-              {mode === "login" ? "Entra para seguir tu reserva sin friccion." : "Crea una cuenta con presencia de producto serio."}
+              {mode === "login" ? "Entra para reservar, pagar y seguir tus reservas." : "Crea tu cuenta para reservar o publicar tu espacio."}
             </h1>
             <p className="mt-5 max-w-xl text-sm leading-relaxed text-[#171616]/62 sm:text-base">
-              El acceso tambien comunica calidad. Por eso deje este flujo mas cercano a una plataforma internacional: mejor jerarquia, mejor lectura y menos ruido visual.
+              Desde tu cuenta puedes explorar espacios, revisar disponibilidad, confirmar pagos y acceder al estado de cada reserva en un solo lugar.
             </p>
             <div className="mt-8 grid gap-3 sm:grid-cols-3">
-              <Feature icon={Sparkles} title="Experiencia" description="Jerarquia visual clara y ritmo editorial." />
-              <Feature icon={ShieldCheck} title="Seguridad" description="OAuth y email password sobre Supabase." />
-              <Feature icon={Building2} title="Host o guest" description="Alta preparada para ambos recorridos." />
+              <Feature icon={Sparkles} title="Explorar" description="Encuentra espacios con parrilla por zona." />
+              <Feature icon={ShieldCheck} title="Reservas" description="Consulta pagos, fechas y estados desde tu cuenta." />
+              <Feature icon={Building2} title="Anfitriones" description="Publica tu espacio y gestiona solicitudes." />
             </div>
           </div>
         </section>
@@ -149,7 +171,7 @@ export default function Login() {
             <div>
               <p className="text-[11px] uppercase tracking-[0.18em] text-[#171616]/35">{mode === "login" ? "Bienvenido" : "Nueva cuenta"}</p>
               <h2 className="mt-3 text-3xl font-semibold text-[#171616]">
-                {mode === "login" ? "Accede a tu panel" : "Empieza a operar en Prende"}
+                {mode === "login" ? "Accede a tu cuenta" : "Empieza en Prende"}
               </h2>
             </div>
             <Badge variant={mode === "login" ? "default" : "brasa"}>{mode === "login" ? "Login" : "Registro"}</Badge>
@@ -271,4 +293,3 @@ function Feature({ icon, title, description }) {
     </div>
   );
 }
-

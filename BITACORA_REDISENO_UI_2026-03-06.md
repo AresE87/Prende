@@ -156,8 +156,7 @@ Validado con `npm run lint`.
 Resultado actual:
 
 - sin errores
-- quedan 2 warnings preexistentes que no fueron introducidos por este rediseño:
-  - `src/components/Features.jsx`: dependencia faltante en `useEffect`
+- queda 1 warning preexistente que no fue introducido por este rediseño:
   - `src/pages/host/HostOnboarding.jsx`: warning del compiler por `watch()` de `react-hook-form`
 
 ### Build local
@@ -239,11 +238,34 @@ Cambios aplicados:
   - agenda disponible
   - seguimiento de reserva
 - se incorporaron keywords mas alineadas con la pagina:
-  - espacios con parrilla
-  - barbacoas
-  - quinchos
-  - Montevideo
-  - reserva online
+- espacios con parrilla
+- barbacoas
+- quinchos
+- Montevideo
+- reserva online
+
+## Ajuste posterior: copy definitivo y navegacion autenticada
+
+Se hizo una pasada adicional para sacar el resto del lenguaje meta que todavia hablaba del rediseño o de la interfaz en lugar del producto.
+
+Cambios aplicados:
+
+- `src/components/Hero.jsx` ahora abre con una promesa comercial directa:
+  - reserva de quinchos, barbacoas y terrazas
+  - foco en Montevideo
+  - CTA principal hacia `buscar` en lugar de una seccion interna
+- `src/components/FinalCTA.jsx` ahora cierra la landing con propuesta de valor y no con explicaciones del UI
+- `src/pages/auth/Login.jsx` ahora habla de reservas, pagos, cuenta y publicacion de espacios
+- `src/components/Navbar.jsx` ya no ofrece `Iniciar sesion` cuando el usuario ya tiene sesion cargada
+- `src/pages/auth/AuthCallback.jsx` ya no redirige a `/` despues de OAuth:
+  - guest autenticado -> `/buscar`
+  - host autenticado -> `/anfitrion/dashboard`
+
+Impacto:
+
+- la landing comunica producto y conversion
+- desaparece el copy que sonaba a nota interna de diseño
+- el usuario autenticado cae en un destino util para reservar o gestionar
 
 ## Como seguiria yo este rediseño
 
