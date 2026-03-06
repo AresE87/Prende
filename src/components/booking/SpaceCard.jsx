@@ -1,7 +1,9 @@
-import { Link } from "react-router-dom";
-import { Users, MapPin } from "lucide-react";
-import { Stars } from "../shared";
+﻿import { Link } from "react-router-dom";
+import { Users, MapPin, ArrowUpRight } from "lucide-react";
+import { Badge, Stars } from "../shared";
 import { formatUYU, AMENITIES } from "../../lib/utils";
+
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800";
 
 export default function SpaceCard({ space, horizontal = false }) {
   const amenities = Array.isArray(space.amenities) ? space.amenities : [];
@@ -9,108 +11,131 @@ export default function SpaceCard({ space, horizontal = false }) {
     ? space.images
     : Array.isArray(space.photos) && space.photos.length > 0
       ? space.photos
-      : ["https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800"];
+      : [FALLBACK_IMAGE];
   const rating = Number(space.rating ?? space.rating_avg ?? 0);
   const reviews = Number(space.reviews ?? space.rating_count ?? 0);
   const capacity = Number(space.capacity ?? space.max_guests ?? 0);
   const price = Number(space.price ?? space.price_per_hour ?? 0);
   const zone = space.zona ?? space.neighborhood ?? "Montevideo";
   const isSuperhost = Boolean(space?.host?.superhost);
-
-  const topAmenities = amenities.slice(0, 3).map(
-    (id) => AMENITIES.find((a) => a.id === id)
-  ).filter(Boolean);
+  const topAmenities = amenities.slice(0, horizontal ? 2 : 3)
+    .map((id) => AMENITIES.find((amenity) => amenity.id === id))
+    .filter(Boolean);
 
   if (horizontal) {
     return (
-      <Link to={`/espacio/${space.id}`} className="block group">
-        <div className="flex gap-4 bg-white rounded-2xl border border-[#1C1917]/8 p-3 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
-          <div className="relative flex-shrink-0 w-32 h-28 sm:w-40 sm:h-32 rounded-xl overflow-hidden">
+      <Link to={`/espacio/${space.id}`} className="group block">
+        <article className="surface-card grid overflow-hidden rounded-[32px] border border-[#171616]/8 p-3 transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_70px_-42px_rgba(23,22,22,0.42)] sm:grid-cols-[220px_minmax(0,1fr)]">
+          <div className="relative overflow-hidden rounded-[24px]">
             <img
               src={images[0]}
               alt={space.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="h-52 w-full object-cover transition duration-500 group-hover:scale-105"
               loading="lazy"
             />
-            {isSuperhost && (
-              <span className="absolute top-2 left-2 bg-[#D4541B] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                SUPERHOST
-              </span>
-            )}
-          </div>
-          <div className="flex-1 min-w-0 py-1">
-            <p className="text-xs text-[#C2956B] font-semibold mb-0.5 flex items-center gap-1 font-['Inter']">
-              <MapPin size={11} /> {zone}
-            </p>
-            <h3 className="font-bold text-[#1C1917] text-sm font-['Plus_Jakarta_Sans'] line-clamp-2 mb-1">
-              {space.title}
-            </h3>
-            <div className="flex items-center gap-2 mb-2">
-              <Stars rating={rating} size={12} />
-              <span className="text-xs text-[#1C1917]/50 font-['Inter']">({reviews})</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <p className="text-[#D4541B] font-bold font-['JetBrains_Mono'] text-sm">
-                {formatUYU(price)}<span className="text-[#1C1917]/40 text-xs font-normal">/hr</span>
-              </p>
-              <span className="text-xs text-[#1C1917]/50 flex items-center gap-1 font-['Inter']">
-                <Users size={11} /> hasta {capacity}
-              </span>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#171616]/55 via-transparent to-transparent" />
+            <div className="absolute left-4 top-4 flex flex-wrap gap-2">
+              {isSuperhost && <Badge variant="brasa">Superhost</Badge>}
+              <Badge variant="default">{capacity} pax</Badge>
             </div>
           </div>
-        </div>
+
+          <div className="flex min-w-0 flex-col justify-between px-2 py-2 sm:px-5">
+            <div>
+              <div className="flex items-center justify-between gap-3">
+                <p className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[#171616]/40">
+                  <MapPin size={12} />
+                  {zone}
+                </p>
+                <span className="rounded-full border border-[#171616]/10 bg-white/75 p-2 text-[#171616]/60 transition group-hover:text-[#d5632a]">
+                  <ArrowUpRight size={15} />
+                </span>
+              </div>
+              <h3 className="mt-3 text-2xl font-semibold leading-tight text-[#171616]">{space.title}</h3>
+              <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-[#171616]/55">
+                <Stars rating={rating} size={13} showNumber />
+                <span>{reviews} reseñas</span>
+                <span className="inline-flex items-center gap-1"><Users size={13} /> Hasta {capacity}</span>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {topAmenities.map((amenity) => (
+                  <span key={amenity.id} className="rounded-full border border-[#171616]/10 bg-white/75 px-3 py-1.5 text-xs text-[#171616]/62">
+                    {amenity.icon} {amenity.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-6 flex items-end justify-between gap-4 border-t border-[#171616]/8 pt-4">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#171616]/35">Desde</p>
+                <p className="mt-1 font-mono text-2xl font-semibold text-[#d5632a]">{formatUYU(price)}</p>
+                <p className="text-xs text-[#171616]/45">por hora</p>
+              </div>
+              <span className="text-sm font-medium text-[#171616]/72">Ver disponibilidad</span>
+            </div>
+          </div>
+        </article>
       </Link>
     );
   }
 
   return (
-    <Link to={`/espacio/${space.id}`} className="block group">
-      <div className="bg-white rounded-2xl border border-[#1C1917]/8 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-200">
-        <div className="relative h-52 overflow-hidden">
+    <Link to={`/espacio/${space.id}`} className="group block h-full">
+      <article className="surface-card flex h-full flex-col overflow-hidden rounded-[32px] border border-[#171616]/8 transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_70px_-42px_rgba(23,22,22,0.42)]">
+        <div className="relative overflow-hidden">
           <img
             src={images[0]}
             alt={space.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="h-64 w-full object-cover transition duration-500 group-hover:scale-105"
             loading="lazy"
           />
-          {isSuperhost && (
-            <span className="absolute top-3 left-3 bg-[#D4541B] text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
-              SUPERHOST
+          <div className="absolute inset-0 bg-gradient-to-t from-[#171616]/65 via-[#171616]/10 to-transparent" />
+          <div className="absolute left-4 right-4 top-4 flex items-start justify-between gap-3">
+            <div className="flex flex-wrap gap-2">
+              {isSuperhost && <Badge variant="brasa">Superhost</Badge>}
+              <Badge variant="default">{zone}</Badge>
+            </div>
+            <div className="rounded-full border border-white/15 bg-[#171616]/55 px-3 py-1.5 text-white backdrop-blur-md">
+              <Stars rating={rating} size={12} showNumber />
+            </div>
+          </div>
+          <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3 text-white">
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.18em] text-white/68">Capacidad</p>
+              <p className="mt-1 text-sm font-medium">Hasta {capacity} personas</p>
+            </div>
+            <span className="rounded-full border border-white/15 bg-white/10 p-2 backdrop-blur-md transition group-hover:bg-[#d5632a]">
+              <ArrowUpRight size={16} />
             </span>
-          )}
-          <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-xl px-2.5 py-1 flex items-center gap-1.5">
-            <Stars rating={rating} size={12} />
-            <span className="text-xs font-bold text-[#1C1917] font-['JetBrains_Mono']">{rating.toFixed(1)}</span>
           </div>
         </div>
 
-        <div className="p-4">
-          <p className="text-xs text-[#C2956B] font-semibold mb-1 flex items-center gap-1 font-['Inter']">
-            <MapPin size={11} /> {zone}
-          </p>
-          <h3 className="font-bold text-[#1C1917] font-['Plus_Jakarta_Sans'] mb-2 line-clamp-2">
-            {space.title}
-          </h3>
-
-          <div className="flex flex-wrap gap-1.5 mb-3">
-            {topAmenities.map((a) => (
-              <span key={a.id} className="text-xs bg-[#FAF7F2] border border-[#1C1917]/10 text-[#1C1917]/70 px-2 py-0.5 rounded-full font-['Inter']">
-                {a.icon} {a.label}
+        <div className="flex flex-1 flex-col px-5 pb-5 pt-5">
+          <h3 className="text-2xl font-semibold leading-tight text-[#171616]">{space.title}</h3>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {topAmenities.map((amenity) => (
+              <span key={amenity.id} className="rounded-full border border-[#171616]/10 bg-white/75 px-3 py-1.5 text-xs text-[#171616]/62">
+                {amenity.icon} {amenity.label}
               </span>
             ))}
           </div>
 
-          <div className="flex items-center justify-between pt-2 border-t border-[#1C1917]/8">
-            <div>
-              <span className="text-[#D4541B] font-bold text-lg font-['JetBrains_Mono']">{formatUYU(price)}</span>
-              <span className="text-[#1C1917]/40 text-xs ml-1 font-['Inter']">/ hora</span>
+          <div className="mt-auto pt-6">
+            <div className="flex items-end justify-between gap-3 border-t border-[#171616]/8 pt-4">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#171616]/35">Desde</p>
+                <p className="mt-1 font-mono text-2xl font-semibold text-[#d5632a]">{formatUYU(price)}</p>
+                <p className="text-xs text-[#171616]/45">por hora</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-medium text-[#171616]">Agenda premium</p>
+                <p className="mt-1 text-xs text-[#171616]/48">Confirmacion inmediata</p>
+              </div>
             </div>
-            <span className="text-xs text-[#1C1917]/50 flex items-center gap-1 font-['Inter']">
-              <Users size={12} /> hasta {capacity} personas
-            </span>
           </div>
         </div>
-      </div>
+      </article>
     </Link>
   );
 }

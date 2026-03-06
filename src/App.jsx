@@ -82,7 +82,7 @@ function LandingPage() {
 // Layout para las páginas de la app (con Navbar de la app)
 function AppLayout({ children }) {
   return (
-    <div className="min-h-screen bg-[#FAF7F2]">
+    <div className="page-ambient min-h-screen overflow-x-clip bg-transparent">
       <Suspense fallback={null}>
         <AppNavbar />
       </Suspense>

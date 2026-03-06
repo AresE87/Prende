@@ -1,21 +1,21 @@
-import { useState } from "react";
+﻿import { createElement, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Flame, Eye, EyeOff } from "lucide-react";
-import { Button, Input, Divider } from "../../components/shared";
+import { Flame, Eye, EyeOff, ArrowRight, ShieldCheck, Sparkles, Building2 } from "lucide-react";
+import { Button, Input, Divider, Card, Badge } from "../../components/shared";
 import { signUpWithEmail, signInWithEmail, signInWithGoogle, supabaseConfigured } from "../../lib/supabase";
 
 const loginSchema = z.object({
-  email:    z.string().email("Email inválido"),
-  password: z.string().min(6, "Mínimo 6 caracteres"),
+  email: z.string().email("Email invalido"),
+  password: z.string().min(6, "Minimo 6 caracteres"),
 });
 
 const registerSchema = loginSchema.extend({
-  name:            z.string().min(2, "Ingresá tu nombre"),
+  name: z.string().min(2, "Ingresa tu nombre"),
   confirmPassword: z.string(),
-}).refine((d) => d.password === d.confirmPassword, {
+}).refine((data) => data.password === data.confirmPassword, {
   message: "Las contraseñas no coinciden",
   path: ["confirmPassword"],
 });
@@ -24,25 +24,25 @@ export default function Login() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const [mode, setMode]         = useState(searchParams.get("mode") === "register" ? "register" : "login");
+  const [mode, setMode] = useState(searchParams.get("mode") === "register" ? "register" : "login");
   const [showPass, setShowPass] = useState(false);
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState(null);
-  const [asHost, setAsHost]     = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [asHost, setAsHost] = useState(false);
   const [confirmEmail, setConfirmEmail] = useState(false);
 
   const schema = mode === "login" ? loginSchema : registerSchema;
   const { register, handleSubmit, formState: { errors }, reset } = useForm({ resolver: zodResolver(schema) });
 
   function switchMode() {
-    setMode((m) => m === "login" ? "register" : "login");
+    setMode((current) => (current === "login" ? "register" : "login"));
     setError(null);
     reset();
   }
 
-  async function onSubmit(d) {
+  async function onSubmit(data) {
     if (!supabaseConfigured) {
-      setError("Supabase no configurado. Agregá VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en .env");
+      setError("Supabase no configurado. Agrega VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en .env");
       return;
     }
 
@@ -51,30 +51,27 @@ export default function Login() {
 
     try {
       if (mode === "register") {
-        const { session } = await signUpWithEmail(d.email, d.password, d.name);
+        const { session } = await signUpWithEmail(data.email, data.password, data.name);
 
         if (!session) {
-          // Supabase requiere confirmación de email
           setConfirmEmail(true);
           setLoading(false);
           return;
         }
 
-        // Si no requiere confirmación, redirigir
         navigate(asHost ? "/anfitrion/onboarding" : "/");
       } else {
-        await signInWithEmail(d.email, d.password);
+        await signInWithEmail(data.email, data.password);
         navigate("/");
       }
     } catch (err) {
       const msg = err.message || "Error al procesar la solicitud";
-      // Traducir errores comunes de Supabase
       if (msg.includes("Invalid login credentials")) {
         setError("Email o contraseña incorrectos");
       } else if (msg.includes("User already registered")) {
         setError("Ya existe una cuenta con ese email");
       } else if (msg.includes("Email not confirmed")) {
-        setError("Confirmá tu email antes de entrar. Revisá tu bandeja de entrada.");
+        setError("Confirma tu email antes de entrar. Revisa tu bandeja.");
       } else if (msg.includes("Password should be at least")) {
         setError("La contraseña debe tener al menos 6 caracteres");
       } else {
@@ -93,80 +90,83 @@ export default function Login() {
     setError(null);
     try {
       await signInWithGoogle();
-      // Redirige automáticamente a Google
     } catch (err) {
       setError(err.message || "Error al conectar con Google");
     }
   }
 
-  // Pantalla de confirmación de email
   if (confirmEmail) {
     return (
-      <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md text-center">
-          <div className="text-5xl mb-6">📬</div>
-          <h1 className="text-xl font-bold text-[#1C1917] font-['Plus_Jakarta_Sans'] mb-3">
-            ¡Revisá tu email!
-          </h1>
-          <p className="text-sm text-[#1C1917]/60 font-['Inter'] mb-6 leading-relaxed">
-            Te enviamos un link de confirmación. Hacé click en el link para activar tu cuenta y empezar a usar Prende.
+      <div className="page-ambient flex min-h-screen items-center justify-center px-4 py-12">
+        <div className="surface-card w-full max-w-xl rounded-[38px] px-8 py-10 text-center">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[linear-gradient(135deg,#171616_0%,#2f2b27_100%)] text-white shadow-[0_24px_44px_-28px_rgba(23,22,22,0.9)]">
+            <ShieldCheck size={34} />
+          </div>
+          <Badge variant="oliva" className="mt-6">Revisa tu email</Badge>
+          <h1 className="mt-5 font-display text-5xl leading-none text-[#171616]">Activa tu cuenta para continuar.</h1>
+          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-[#171616]/62">
+            Te enviamos un link de confirmacion. Apenas lo abras, quedaras listo para reservar o publicar tu espacio.
           </p>
-          <button
-            onClick={() => { setConfirmEmail(false); setMode("login"); }}
-            className="text-sm text-[#D4541B] font-semibold hover:underline font-['Inter']"
-          >
+          <Button variant="outline" className="mt-8" onClick={() => { setConfirmEmail(false); setMode("login"); }}>
             Volver al login
-          </button>
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <Flame size={28} className="text-[#D4541B]" />
-            <span className="text-2xl font-bold text-[#1C1917] font-['Plus_Jakarta_Sans']">Prende</span>
+    <div className="page-ambient min-h-screen px-4 py-8 sm:px-6 sm:py-10">
+      <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[minmax(0,1.05fr)_520px]">
+        <section className="section-shell flex rounded-[40px] px-6 py-8 sm:px-8 sm:py-10">
+          <div className="my-auto max-w-2xl">
+            <Badge variant="brasa">Acceso premium</Badge>
+            <div className="mt-6 inline-flex items-center gap-3 rounded-full border border-[#171616]/10 bg-white/75 px-4 py-3 shadow-[0_16px_28px_-24px_rgba(23,22,22,0.65)]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#171616] text-[#f7f1e8] shadow-[0_16px_24px_-18px_rgba(23,22,22,0.82)]">
+                <Flame size={18} />
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#171616]/35">Prende</p>
+                <p className="text-sm font-semibold text-[#171616]">Reservas y pagos bien resueltos</p>
+              </div>
+            </div>
+            <h1 className="mt-6 font-display text-5xl leading-none text-[#171616] sm:text-6xl lg:text-7xl">
+              {mode === "login" ? "Entra para seguir tu reserva sin friccion." : "Crea una cuenta con presencia de producto serio."}
+            </h1>
+            <p className="mt-5 max-w-xl text-sm leading-relaxed text-[#171616]/62 sm:text-base">
+              El acceso tambien comunica calidad. Por eso deje este flujo mas cercano a una plataforma internacional: mejor jerarquia, mejor lectura y menos ruido visual.
+            </p>
+            <div className="mt-8 grid gap-3 sm:grid-cols-3">
+              <Feature icon={Sparkles} title="Experiencia" description="Jerarquia visual clara y ritmo editorial." />
+              <Feature icon={ShieldCheck} title="Seguridad" description="OAuth y email password sobre Supabase." />
+              <Feature icon={Building2} title="Host o guest" description="Alta preparada para ambos recorridos." />
+            </div>
           </div>
-          <h1 className="text-xl font-bold text-[#1C1917] font-['Plus_Jakarta_Sans']">
-            {mode === "login" ? "Bienvenido de nuevo" : "Creá tu cuenta"}
-          </h1>
-          <p className="text-sm text-[#1C1917]/50 mt-1 font-['Inter']">
-            {mode === "login" ? "Entrá para ver tus reservas" : "Empezá a disfrutar espacios únicos"}
-          </p>
-        </div>
+        </section>
 
-        <div className="bg-white rounded-2xl border border-[#1C1917]/10 shadow-sm p-6">
+        <Card className="rounded-[40px] p-6 sm:p-8">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[#171616]/35">{mode === "login" ? "Bienvenido" : "Nueva cuenta"}</p>
+              <h2 className="mt-3 text-3xl font-semibold text-[#171616]">
+                {mode === "login" ? "Accede a tu panel" : "Empieza a operar en Prende"}
+              </h2>
+            </div>
+            <Badge variant={mode === "login" ? "default" : "brasa"}>{mode === "login" ? "Login" : "Registro"}</Badge>
+          </div>
 
-          {/* Error global */}
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 font-['Inter']">
+            <div className="mt-5 rounded-[24px] border border-red-200 bg-red-50 px-4 py-4 text-sm text-red-700">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
             {mode === "register" && (
-              <Input
-                label="Nombre completo"
-                placeholder="Juan Pérez"
-                error={errors.name?.message}
-                {...register("name")}
-              />
+              <Input label="Nombre completo" placeholder="Juan Perez" error={errors.name?.message} {...register("name")} />
             )}
 
-            <Input
-              label="Email"
-              type="email"
-              placeholder="vos@email.com"
-              autoComplete="email"
-              error={errors.email?.message}
-              {...register("email")}
-            />
+            <Input label="Email" type="email" placeholder="tu@email.com" autoComplete="email" error={errors.email?.message} {...register("email")} />
 
             <div className="relative">
               <Input
@@ -175,12 +175,14 @@ export default function Login() {
                 placeholder="••••••••"
                 autoComplete={mode === "login" ? "current-password" : "new-password"}
                 error={errors.password?.message}
+                className="pr-12"
                 {...register("password")}
               />
               <button
                 type="button"
-                onClick={() => setShowPass(!showPass)}
-                className="absolute right-3 top-9 text-[#1C1917]/40 hover:text-[#1C1917] transition-colors"
+                onClick={() => setShowPass((value) => !value)}
+                className="absolute right-4 top-[42px] text-[#171616]/42 transition hover:text-[#171616]"
+                aria-label="Mostrar u ocultar contraseña"
               >
                 {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -197,41 +199,47 @@ export default function Login() {
             )}
 
             {mode === "register" && (
-              <div className="bg-[#FAF7F2] rounded-xl p-4">
-                <p className="text-sm font-semibold text-[#1C1917] mb-3 font-['Inter']">¿Para qué vas a usar Prende?</p>
-                <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-[28px] border border-[#171616]/8 bg-white/70 p-4">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#171616]/35">Tipo de cuenta</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   {[
-                    { val: false, icon: "🔥", label: "Reservar espacios", sub: "Quiero asarme" },
-                    { val: true,  icon: "🏡", label: "Publicar mi espacio", sub: "Quiero ganar" },
-                  ].map(({ val, icon, label, sub }) => (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => setAsHost(val)}
-                      className={`p-3 rounded-xl border text-left transition-all ${asHost === val ? "border-[#D4541B] bg-[#D4541B]/8" : "border-[#1C1917]/15 hover:border-[#1C1917]/30"}`}
-                    >
-                      <span className="text-xl block mb-1">{icon}</span>
-                      <p className="text-xs font-bold text-[#1C1917] font-['Inter']">{label}</p>
-                      <p className="text-[10px] text-[#1C1917]/40 font-['Inter']">{sub}</p>
-                    </button>
-                  ))}
+                    { value: false, icon: Sparkles, title: "Reservar espacios", description: "Quiero usar la plataforma como guest" },
+                    { value: true, icon: Building2, title: "Publicar mi espacio", description: "Quiero vender disponibilidad" },
+                  ].map((item) => {
+                    const active = asHost === item.value;
+                    return (
+                      <button
+                        key={item.title}
+                        type="button"
+                        onClick={() => setAsHost(item.value)}
+                        className={`rounded-[24px] border px-4 py-4 text-left transition ${active ? "border-[#d5632a]/25 bg-[#fff1e8]" : "border-[#171616]/8 bg-white/75 hover:border-[#171616]/18"}`}
+                      >
+                        <div className={`flex h-11 w-11 items-center justify-center rounded-full ${active ? "bg-[#d5632a] text-white" : "bg-[#171616] text-[#f7f1e8]"}`}>
+                          <item.icon size={18} />
+                        </div>
+                        <p className="mt-4 text-sm font-semibold text-[#171616]">{item.title}</p>
+                        <p className="mt-2 text-sm leading-relaxed text-[#171616]/58">{item.description}</p>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
             <Button type="submit" fullWidth size="lg" loading={loading}>
               {loading ? "Procesando..." : mode === "login" ? "Entrar" : "Crear cuenta"}
+              {!loading && <ArrowRight size={16} />}
             </Button>
           </form>
 
-          <Divider className="my-4" />
+          <Divider className="my-6" />
 
-          {/* Google OAuth */}
           <button
+            type="button"
             onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-3 py-3 border border-[#1C1917]/20 rounded-xl text-sm font-medium text-[#1C1917] hover:bg-[#FAF7F2] transition-colors font-['Inter']"
+            className="flex w-full items-center justify-center gap-3 rounded-full border border-[#171616]/10 bg-white/80 px-5 py-3.5 text-sm font-medium text-[#171616] shadow-[0_14px_28px_-24px_rgba(23,22,22,0.62)] transition hover:-translate-y-0.5 hover:bg-white"
           >
-            <svg width="18" height="18" viewBox="0 0 18 18">
+            <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
               <path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/>
               <path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/>
               <path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/>
@@ -239,16 +247,28 @@ export default function Login() {
             </svg>
             Continuar con Google
           </button>
-        </div>
 
-        <p className="text-center text-sm text-[#1C1917]/50 mt-5 font-['Inter']">
-          {mode === "login" ? "¿No tenés cuenta?" : "¿Ya tenés cuenta?"}
-          {" "}
-          <button onClick={switchMode} className="text-[#D4541B] font-semibold hover:underline">
-            {mode === "login" ? "Registrate" : "Entrar"}
-          </button>
-        </p>
+          <p className="mt-6 text-center text-sm text-[#171616]/58">
+            {mode === "login" ? "No tienes cuenta?" : "Ya tienes cuenta?"}{" "}
+            <button type="button" onClick={switchMode} className="font-semibold text-[#d5632a] transition hover:text-[#b44a1d]">
+              {mode === "login" ? "Registrate" : "Entrar"}
+            </button>
+          </p>
+        </Card>
       </div>
     </div>
   );
 }
+
+function Feature({ icon, title, description }) {
+  return (
+    <div className="glass-shell rounded-[28px] px-4 py-4">
+      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#171616] text-[#f7f1e8] shadow-[0_18px_30px_-22px_rgba(23,22,22,0.9)]">
+        {createElement(icon, { size: 16 })}
+      </div>
+      <p className="mt-4 text-sm font-semibold text-[#171616]">{title}</p>
+      <p className="mt-2 text-sm leading-relaxed text-[#171616]/58">{description}</p>
+    </div>
+  );
+}
+

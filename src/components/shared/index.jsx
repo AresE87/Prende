@@ -1,8 +1,7 @@
-import { forwardRef } from "react";
+﻿import { forwardRef } from "react";
 import { X, Star, ChevronDown } from "lucide-react";
 import { cn, starArray } from "../../lib/utils";
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ BUTTON Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export function Button({
   children,
   variant = "primary",
@@ -12,22 +11,22 @@ export function Button({
   className = "",
   ...props
 }) {
-  const base = "inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2";
+  const base = "inline-flex items-center justify-center gap-2 rounded-full border text-sm font-semibold transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-55 focus:outline-none focus:ring-2 focus:ring-[#d5632a]/40 focus:ring-offset-2 focus:ring-offset-transparent";
 
   const variants = {
-    primary:   "bg-[#D4541B] text-white hover:bg-[#B8441A] focus:ring-[#D4541B] active:scale-95",
-    secondary: "bg-[#1C1917] text-[#F5F0E8] hover:bg-[#2D2926] focus:ring-[#1C1917] active:scale-95",
-    outline:   "border-2 border-[#1C1917] text-[#1C1917] hover:bg-[#1C1917] hover:text-white focus:ring-[#1C1917]",
-    ghost:     "text-[#1C1917] hover:bg-[#1C1917]/8 focus:ring-[#1C1917]",
-    danger:    "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
-    success:   "bg-[#4A5E3A] text-white hover:bg-[#3d4e30] focus:ring-[#4A5E3A]",
+    primary: "border-[#d5632a] bg-[linear-gradient(135deg,#df7137_0%,#c95422_100%)] text-white shadow-[0_18px_35px_-24px_rgba(213,99,42,0.9)] hover:-translate-y-0.5 hover:shadow-[0_22px_44px_-24px_rgba(213,99,42,0.75)] active:translate-y-0",
+    secondary: "border-[#171616] bg-[#171616] text-[#f8f3ea] shadow-[0_18px_36px_-26px_rgba(23,22,22,0.82)] hover:-translate-y-0.5 hover:bg-[#24211f]",
+    outline: "border-[#171616]/14 bg-white/75 text-[#171616] shadow-[0_10px_30px_-26px_rgba(23,22,22,0.55)] hover:-translate-y-0.5 hover:border-[#171616]/28 hover:bg-white",
+    ghost: "border-transparent bg-transparent text-[#171616] hover:bg-[#171616]/6",
+    danger: "border-red-600 bg-red-600 text-white shadow-[0_18px_35px_-24px_rgba(220,38,38,0.7)] hover:-translate-y-0.5 hover:bg-red-700",
+    success: "border-[#5f6f52] bg-[#5f6f52] text-white shadow-[0_18px_35px_-24px_rgba(95,111,82,0.72)] hover:-translate-y-0.5 hover:bg-[#516145]",
   };
 
   const sizes = {
-    sm:  "px-3 py-1.5 text-sm",
-    md:  "px-5 py-2.5 text-sm",
-    lg:  "px-7 py-3.5 text-base",
-    xl:  "px-9 py-4 text-lg",
+    sm: "px-4 py-2 text-xs",
+    md: "px-5 py-3",
+    lg: "px-6 py-3.5 text-base",
+    xl: "px-7 py-4 text-base",
   };
 
   return (
@@ -37,14 +36,13 @@ export function Button({
       {...props}
     >
       {loading && (
-        <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+        <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
       )}
       {children}
     </button>
   );
 }
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ INPUT Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export const Input = forwardRef(function Input({
   label,
   error,
@@ -53,170 +51,182 @@ export const Input = forwardRef(function Input({
   ...props
 }, ref) {
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-2">
       {label && (
-        <label className="text-sm font-medium text-[#1C1917] font-['Inter']">
+        <label className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#171616]/42">
           {label}
         </label>
       )}
       <div className="relative">
         {Icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#C2956B]">
-            <Icon size={18} />
+          <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#171616]/40">
+            <Icon size={16} />
           </div>
         )}
         <input
           ref={ref}
           className={cn(
-            "w-full rounded-xl border border-[#1C1917]/20 bg-white px-4 py-3 text-[#1C1917] placeholder:text-[#1C1917]/40",
-            "focus:outline-none focus:ring-2 focus:ring-[#D4541B] focus:border-transparent",
-            "transition-all font-['Inter'] text-sm",
-            error && "border-red-400 focus:ring-red-400",
-            Icon && "pl-10",
-            className
+            "w-full rounded-[22px] border border-[#171616]/10 bg-white/80 px-4 py-3.5 text-sm text-[#171616] shadow-[0_16px_40px_-34px_rgba(23,22,22,0.72)] outline-none transition duration-300 placeholder:text-[#171616]/35 focus:border-[#d5632a]/40 focus:bg-white focus:ring-4 focus:ring-[#d5632a]/10",
+            Icon && "pl-11",
+            error && "border-red-300 focus:border-red-400 focus:ring-red-100",
+            className,
           )}
           {...props}
         />
       </div>
-      {error && <p className="text-xs text-red-500 font-['Inter']">{error}</p>}
+      {error && <p className="text-xs text-red-600">{error}</p>}
     </div>
   );
 });
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ TEXTAREA Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
-export const Textarea = forwardRef(function Textarea({
-  label, error, className = "", ...props
-}, ref) {
+export const Textarea = forwardRef(function Textarea({ label, error, className = "", ...props }, ref) {
   return (
-    <div className="flex flex-col gap-1.5">
-      {label && <label className="text-sm font-medium text-[#1C1917]">{label}</label>}
+    <div className="flex flex-col gap-2">
+      {label && (
+        <label className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#171616]/42">
+          {label}
+        </label>
+      )}
       <textarea
         ref={ref}
         className={cn(
-          "w-full rounded-xl border border-[#1C1917]/20 bg-white px-4 py-3 text-[#1C1917] placeholder:text-[#1C1917]/40",
-          "focus:outline-none focus:ring-2 focus:ring-[#D4541B] focus:border-transparent",
-          "transition-all font-['Inter'] text-sm resize-none",
-          error && "border-red-400 focus:ring-red-400",
-          className
+          "w-full rounded-[22px] border border-[#171616]/10 bg-white/80 px-4 py-3.5 text-sm text-[#171616] shadow-[0_16px_40px_-34px_rgba(23,22,22,0.72)] outline-none transition duration-300 placeholder:text-[#171616]/35 focus:border-[#d5632a]/40 focus:bg-white focus:ring-4 focus:ring-[#d5632a]/10 resize-none",
+          error && "border-red-300 focus:border-red-400 focus:ring-red-100",
+          className,
         )}
         {...props}
       />
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-red-600">{error}</p>}
     </div>
   );
 });
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ SELECT Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export const Select = forwardRef(function Select({
-  label, error, options = [], placeholder = "SeleccionÃƒÂ¡...", className = "", ...props
+  label,
+  error,
+  options = [],
+  placeholder = "Selecciona...",
+  className = "",
+  ...props
 }, ref) {
   return (
-    <div className="flex flex-col gap-1.5">
-      {label && <label className="text-sm font-medium text-[#1C1917]">{label}</label>}
+    <div className="flex flex-col gap-2">
+      {label && (
+        <label className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#171616]/42">
+          {label}
+        </label>
+      )}
       <div className="relative">
         <select
           ref={ref}
           className={cn(
-            "w-full appearance-none rounded-xl border border-[#1C1917]/20 bg-white px-4 py-3 pr-10",
-            "text-[#1C1917] focus:outline-none focus:ring-2 focus:ring-[#D4541B]",
-            "font-['Inter'] text-sm cursor-pointer",
-            error && "border-red-400",
-            className
+            "w-full appearance-none rounded-[22px] border border-[#171616]/10 bg-white/80 px-4 py-3.5 pr-10 text-sm text-[#171616] shadow-[0_16px_40px_-34px_rgba(23,22,22,0.72)] outline-none transition duration-300 focus:border-[#d5632a]/40 focus:bg-white focus:ring-4 focus:ring-[#d5632a]/10",
+            error && "border-red-300 focus:border-red-400 focus:ring-red-100",
+            className,
           )}
           {...props}
         >
           <option value="">{placeholder}</option>
-          {options.map((o) => (
-            <option key={o.value ?? o} value={o.value ?? o}>
-              {o.label ?? o}
+          {options.map((option) => (
+            <option key={option.value ?? option} value={option.value ?? option}>
+              {option.label ?? option}
             </option>
           ))}
         </select>
-        <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#C2956B] pointer-events-none" />
+        <ChevronDown size={16} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#171616]/38" />
       </div>
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-red-600">{error}</p>}
     </div>
   );
 });
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ BADGE Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export function Badge({ children, variant = "default", className = "" }) {
   const variants = {
-    default:   "bg-[#1C1917]/10 text-[#1C1917]",
-    brasa:     "bg-[#D4541B]/15 text-[#D4541B]",
-    terracota: "bg-[#C2956B]/20 text-[#8B6347]",
-    oliva:     "bg-[#4A5E3A]/15 text-[#4A5E3A]",
-    success:   "bg-green-100 text-green-700",
-    warning:   "bg-amber-100 text-amber-700",
-    danger:    "bg-red-100 text-red-700",
+    default: "border border-[#171616]/10 bg-white/70 text-[#171616]",
+    brasa: "border border-[#d5632a]/15 bg-[#fff1e8] text-[#c24f20]",
+    terracota: "border border-[#d8b38f]/30 bg-[#f6ece2] text-[#8c6248]",
+    oliva: "border border-[#5f6f52]/18 bg-[#eff3eb] text-[#5f6f52]",
+    success: "border border-emerald-200 bg-emerald-50 text-emerald-700",
+    warning: "border border-amber-200 bg-amber-50 text-amber-700",
+    danger: "border border-red-200 bg-red-50 text-red-700",
   };
+
   return (
-    <span className={cn(
-      "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold font-['Inter']",
-      variants[variant], className
-    )}>
+    <span className={cn("inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]", variants[variant], className)}>
       {children}
     </span>
   );
 }
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ AVATAR Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export function Avatar({ src, name = "", size = "md", className = "" }) {
-  const sizes = { sm: "w-8 h-8 text-xs", md: "w-10 h-10 text-sm", lg: "w-14 h-14 text-lg", xl: "w-20 h-20 text-2xl" };
-  const initials = name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+  const sizes = {
+    sm: "h-9 w-9 text-sm",
+    md: "h-12 w-12 text-base",
+    lg: "h-16 w-16 text-xl",
+  };
 
-  return src ? (
-    <img src={src} alt={name} className={cn("rounded-full object-cover flex-shrink-0", sizes[size], className)} />
-  ) : (
-    <div className={cn("rounded-full bg-[#C2956B] text-white flex items-center justify-center font-semibold flex-shrink-0", sizes[size], className)}>
-      {initials || "?"}
+  const initials = String(name)
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+
+  if (src) {
+    return <img src={src} alt={name} className={cn("rounded-[24px] object-cover shadow-[0_16px_30px_-26px_rgba(23,22,22,0.7)]", sizes[size], className)} />;
+  }
+
+  return (
+    <div className={cn("flex items-center justify-center rounded-[24px] bg-[linear-gradient(135deg,#171616_0%,#36302b_100%)] font-semibold text-[#f7f1e8] shadow-[0_16px_30px_-26px_rgba(23,22,22,0.7)]", sizes[size], className)}>
+      {initials || "PR"}
     </div>
   );
 }
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ STARS Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export function Stars({ rating, size = 14, showNumber = false }) {
+  const safeRating = Number.isFinite(Number(rating)) ? Number(rating) : 0;
+
   return (
-    <span className="inline-flex items-center gap-0.5">
-      {starArray(rating).map((filled, i) => (
-        <Star key={i} size={size} className={filled ? "text-[#D4541B] fill-[#D4541B]" : "text-[#1C1917]/20"} />
-      ))}
-      {showNumber && <span className="ml-1 text-sm font-semibold text-[#1C1917] font-['JetBrains_Mono']">{rating.toFixed(1)}</span>}
-    </span>
+    <div className="inline-flex items-center gap-1.5">
+      <div className="inline-flex items-center gap-0.5 text-[#d5632a]">
+        {starArray(safeRating).map((filled, index) => (
+          <Star key={index} size={size} className={filled ? "fill-current" : "text-[#171616]/16"} />
+        ))}
+      </div>
+      {showNumber && <span className="font-mono text-xs font-semibold text-[#171616]">{safeRating.toFixed(1)}</span>}
+    </div>
   );
 }
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ MODAL Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export function Modal({ open, onClose, title, children, className = "" }) {
   if (!open) return null;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className={cn(
-        "relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-h-[90vh] overflow-y-auto",
-        "sm:max-w-lg",
-        className
-      )}>
-        <div className="sticky top-0 bg-white z-10 flex items-center justify-between px-6 py-4 border-b border-[#1C1917]/10">
-          <h3 className="text-lg font-bold text-[#1C1917] font-['Plus_Jakarta_Sans']">{title}</h3>
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-[#1C1917]/8 transition-colors">
-            <X size={20} className="text-[#1C1917]" />
-          </button>
-        </div>
-        <div className="px-6 py-5">{children}</div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#171616]/45 px-4 backdrop-blur-sm" onClick={onClose}>
+      <div className={cn("surface-card relative w-full max-w-xl rounded-[32px] p-6", className)} onClick={(event) => event.stopPropagation()}>
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-full border border-[#171616]/10 bg-white/80 p-2 text-[#171616]/70 transition hover:bg-white hover:text-[#171616]"
+          aria-label="Cerrar"
+        >
+          <X size={16} />
+        </button>
+        {title && <h3 className="pr-10 text-2xl font-bold text-[#171616]">{title}</h3>}
+        <div className={cn(title && "mt-4")}>{children}</div>
       </div>
     </div>
   );
 }
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ CARD Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export function Card({ children, className = "", hover = false, ...props }) {
   return (
     <div
       className={cn(
-        "bg-white rounded-2xl border border-[#1C1917]/8 shadow-sm",
-        hover && "cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200",
-        className
+        "surface-card rounded-[30px] p-0",
+        hover && "transition duration-300 hover:-translate-y-1 hover:shadow-[0_28px_70px_-40px_rgba(23,22,22,0.34)]",
+        className,
       )}
       {...props}
     >
@@ -225,99 +235,103 @@ export function Card({ children, className = "", hover = false, ...props }) {
   );
 }
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ DIVIDER Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export function Divider({ className = "" }) {
-  return <hr className={cn("border-[#1C1917]/10", className)} />;
+  return <div className={cn("h-px w-full bg-gradient-to-r from-transparent via-[#171616]/10 to-transparent", className)} />;
 }
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ SKELETON Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export function Skeleton({ className = "" }) {
-  return <div className={cn("animate-pulse bg-[#1C1917]/8 rounded-lg", className)} />;
+  return <div className={cn("animate-pulse rounded-[22px] bg-[#171616]/7", className)} />;
 }
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ STEP INDICATOR Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export function StepIndicator({ steps, current }) {
   return (
-    <div className="flex items-center gap-0">
-      {steps.map((step, i) => (
-        <div key={i} className="flex items-center">
-          <div className={cn(
-            "flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold transition-all",
-            i < current  && "bg-[#D4541B] text-white",
-            i === current && "bg-[#1C1917] text-white ring-4 ring-[#1C1917]/20",
-            i > current  && "bg-[#1C1917]/10 text-[#1C1917]/40",
-          )}>
-            {i < current ? "Ã¢Å“â€œ" : i + 1}
+    <div className="flex flex-wrap items-center gap-3">
+      {steps.map((step, index) => {
+        const done = index < current;
+        const active = index === current;
+
+        return (
+          <div key={step} className="flex items-center gap-3">
+            <div className={cn(
+              "flex h-10 w-10 items-center justify-center rounded-full border text-xs font-semibold transition-all",
+              done && "border-[#d5632a] bg-[#d5632a] text-white",
+              active && "border-[#171616] bg-[#171616] text-white shadow-[0_14px_30px_-20px_rgba(23,22,22,0.9)]",
+              !done && !active && "border-[#171616]/10 bg-white/70 text-[#171616]/45",
+            )}>
+              {done ? "OK" : index + 1}
+            </div>
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.16em] text-[#171616]/35">Paso {index + 1}</p>
+              <p className="text-sm font-medium text-[#171616]">{step}</p>
+            </div>
           </div>
-          {i < steps.length - 1 && (
-            <div className={cn("h-0.5 w-8 sm:w-16 transition-all", i < current ? "bg-[#D4541B]" : "bg-[#1C1917]/10")} />
-          )}
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ AMENITY TAG Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export function AmenityTag({ icon, label }) {
   return (
-    <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#FAF7F2] border border-[#1C1917]/10 text-sm text-[#1C1917]">
+    <div className="inline-flex items-center gap-2 rounded-full border border-[#171616]/10 bg-white/80 px-4 py-2 text-sm text-[#171616] shadow-[0_12px_28px_-26px_rgba(23,22,22,0.55)]">
       <span>{icon}</span>
-      <span className="font-['Inter']">{label}</span>
+      <span className="font-medium">{label}</span>
     </div>
   );
 }
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ EMPTY STATE Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
-export function EmptyState({ icon = "Ã°Å¸â€Â¥", title, description, action }) {
+export function EmptyState({ icon = "*", title, description, action }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-      <div className="text-5xl mb-4">{icon}</div>
-      <h3 className="text-xl font-bold text-[#1C1917] font-['Plus_Jakarta_Sans'] mb-2">{title}</h3>
-      <p className="text-[#1C1917]/60 font-['Inter'] max-w-sm mb-6">{description}</p>
-      {action}
+    <div className="section-shell rounded-[36px] px-6 py-14 text-center">
+      <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#171616] text-2xl text-[#f7f1e8] shadow-[0_22px_40px_-28px_rgba(23,22,22,0.85)]">
+        {icon}
+      </div>
+      <h3 className="mt-6 font-display text-4xl leading-none text-[#171616]">{title}</h3>
+      <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-[#171616]/62">{description}</p>
+      {action && <div className="mt-8">{action}</div>}
     </div>
   );
 }
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ PAGE CONTAINER Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export function PageContainer({ children, className = "" }) {
   return (
-    <main className={cn("max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-16", className)}>
+    <main className={cn("page-ambient relative mx-auto max-w-7xl px-4 pb-18 pt-8 sm:px-6 lg:px-8", className)}>
       {children}
     </main>
   );
 }
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ SECTION TITLE Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export function SectionTitle({ children, sub, className = "" }) {
   return (
-    <div className={cn("mb-6", className)}>
-      <h2 className="text-2xl sm:text-3xl font-bold text-[#1C1917] font-['Plus_Jakarta_Sans']">{children}</h2>
-      {sub && <p className="mt-1.5 text-[#1C1917]/60 font-['Inter']">{sub}</p>}
+    <div className={cn("mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between", className)}>
+      <div>
+        <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#171616]/40">Prende</p>
+        <h2 className="mt-2 font-display text-5xl leading-none text-[#171616] sm:text-6xl">{children}</h2>
+      </div>
+      {sub && <p className="max-w-xl text-sm leading-relaxed text-[#171616]/62 sm:text-base">{sub}</p>}
     </div>
   );
 }
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ STATUS BADGE Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export function StatusBadge({ status }) {
   const map = {
-    confirmada:    { label: "Confirmada",  variant: "success" },
-    pendiente:     { label: "Pendiente",   variant: "warning" },
-    completada:    { label: "Completada",  variant: "default" },
-    cancelada:     { label: "Cancelada",   variant: "danger"  },
-    rechazada:     { label: "Rechazada",   variant: "danger"  },
-    pending:       { label: "Pendiente",   variant: "warning" },
-    paid:          { label: "Pagada",      variant: "success" },
-    confirmed:     { label: "Confirmada",  variant: "success" },
-    completed:     { label: "Completada",  variant: "default" },
-    cancelled:     { label: "Cancelada",   variant: "danger"  },
-    refunded:      { label: "Reembolsada", variant: "warning" },
-    released:      { label: "Liquidada",   variant: "oliva"   },
-    approved:      { label: "Aprobado",    variant: "success" },
-    rejected:      { label: "Rechazado",   variant: "danger"  },
-    in_mediation:  { label: "En disputa",  variant: "warning" },
+    confirmada: { label: "Confirmada", variant: "success" },
+    pendiente: { label: "Pendiente", variant: "warning" },
+    completada: { label: "Completada", variant: "default" },
+    cancelada: { label: "Cancelada", variant: "danger" },
+    rechazada: { label: "Rechazada", variant: "danger" },
+    pending: { label: "Pendiente", variant: "warning" },
+    paid: { label: "Pagada", variant: "success" },
+    confirmed: { label: "Confirmada", variant: "success" },
+    completed: { label: "Completada", variant: "default" },
+    cancelled: { label: "Cancelada", variant: "danger" },
+    refunded: { label: "Reembolsada", variant: "warning" },
+    released: { label: "Liquidada", variant: "oliva" },
+    approved: { label: "Aprobado", variant: "success" },
+    rejected: { label: "Rechazado", variant: "danger" },
+    in_mediation: { label: "En disputa", variant: "warning" },
   };
-  const { label, variant } = map[status] ?? { label: status, variant: "default" };
-  return <Badge variant={variant}>{label}</Badge>;
+
+  const resolved = map[status] ?? { label: status, variant: "default" };
+  return <Badge variant={resolved.variant}>{resolved.label}</Badge>;
 }

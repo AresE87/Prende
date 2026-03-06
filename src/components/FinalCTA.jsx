@@ -1,60 +1,71 @@
-import { useEffect, useRef } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { Flame } from 'lucide-react'
+﻿import { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Flame, ArrowRight, ShieldCheck } from "lucide-react";
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger);
 
 export default function FinalCTA() {
-  const sectionRef = useRef(null)
+  const sectionRef = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from('.cta-content > *', {
-        y: 30,
+      gsap.from(".cta-content > *", {
+        y: 28,
         opacity: 0,
         duration: 0.8,
-        stagger: 0.15,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: sectionRef.current, start: 'top 70%' },
-      })
-    }, sectionRef)
-    return () => ctx.revert()
-  }, [])
+        stagger: 0.12,
+        ease: "power3.out",
+        scrollTrigger: { trigger: sectionRef.current, start: "top 72%" },
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <section ref={sectionRef} id="reserva" className="bg-carbon py-24 sm:py-32">
-      <div className="max-w-3xl mx-auto px-6 sm:px-8 text-center cta-content">
-        {/* Icon */}
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brasa/10 mb-8">
-          <Flame className="w-7 h-7 text-brasa" />
+    <section ref={sectionRef} id="reserva" className="bg-[#171616] px-4 py-24 sm:px-6 sm:py-32">
+      <div className="cta-content section-shell mx-auto max-w-5xl rounded-[44px] border-white/6 bg-[linear-gradient(135deg,#171616_0%,#261f1b_50%,#171616_100%)] px-6 py-10 text-center text-white sm:px-10 sm:py-14">
+        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-white/10 shadow-[0_24px_44px_-30px_rgba(0,0,0,0.7)]">
+          <Flame className="h-8 w-8 text-[#d5632a]" />
         </div>
 
-        {/* Title */}
-        <h2 className="font-jakarta font-bold text-3xl sm:text-4xl md:text-5xl text-crema tracking-tight mb-6 leading-tight">
-          El próximo asado es en{' '}
-          <span className="font-cormorant italic text-brasa">Prende.</span>
+        <p className="mt-6 text-[11px] uppercase tracking-[0.22em] text-white/46">Lanzamiento premium</p>
+        <h2 className="mt-4 font-display text-5xl leading-none text-white sm:text-6xl lg:text-7xl">
+          Lleva tu proximo encuentro a una reserva mejor resuelta.
         </h2>
-
-        {/* Subtitle */}
-        <p className="font-inter text-base sm:text-lg text-crema/50 mb-10 max-w-md mx-auto leading-relaxed">
-          Reservá en 2 minutos. Sin compromiso. Solo llevá las ganas.
+        <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-white/68 sm:text-base">
+          Explora espacios, paga con medios locales y confirma en una interfaz que ya se siente mucho mas cerca de una plataforma internacional.
         </p>
 
-        {/* CTA button */}
-        <a
-          href="#reserva"
-          className="inline-flex items-center gap-2 bg-brasa text-crema font-jakarta font-bold text-lg px-10 py-5 rounded-full hover:translate-y-[-2px] hover:shadow-xl hover:shadow-brasa/25 transition-all duration-300 relative overflow-hidden group"
-        >
-          <span className="relative z-10">Reservá tu espacio</span>
-          <span className="absolute inset-0 bg-gradient-to-r from-[#e86030] to-brasa opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        </a>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link to="/buscar" className="inline-flex items-center gap-2 rounded-full bg-[#d5632a] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_22px_40px_-24px_rgba(213,99,42,0.82)] transition hover:-translate-y-0.5 hover:bg-[#c75424]">
+            Explorar espacios
+            <ArrowRight size={15} />
+          </Link>
+          <Link to="/login?mode=register" className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-6 py-3.5 text-sm font-medium text-white backdrop-blur-md transition hover:bg-white/16">
+            Publicar mi espacio
+          </Link>
+        </div>
 
-        {/* Microcopy */}
-        <p className="font-inter text-xs text-crema/30 mt-6">
-          Más de 80 espacios · Sin depósito · Cancelación gratis
-        </p>
+        <div className="mt-10 grid gap-3 sm:grid-cols-3">
+          <Stat text="Checkout embebido y fallback wallet" />
+          <Stat text="Arquitectura lista para produccion" />
+          <Stat text="Operativa segura con trazabilidad" icon />
+        </div>
       </div>
     </section>
-  )
+  );
+}
+
+function Stat({ text, icon = false }) {
+  return (
+    <div className="rounded-[26px] border border-white/10 bg-white/8 px-4 py-4 text-sm text-white/76 backdrop-blur-md">
+      <div className="flex items-center justify-center gap-2">
+        {icon && <ShieldCheck size={15} className="text-[#d5632a]" />}
+        <span>{text}</span>
+      </div>
+    </div>
+  );
 }

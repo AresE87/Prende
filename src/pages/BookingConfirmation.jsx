@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+﻿import { createElement, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { CheckCircle2 } from "lucide-react";
-import { Button, Card, Skeleton } from "../components/shared";
+import { CheckCircle2, CalendarDays, Clock3, Users, ArrowRight, ShieldCheck } from "lucide-react";
+import { Button, Card, Skeleton, Badge, PageContainer } from "../components/shared";
 import { supabase } from "../lib/supabase";
 import { formatUYU, formatDate } from "../lib/utils";
 
@@ -20,7 +20,7 @@ export function BookingConfirmation() {
     async function loadBooking() {
       setLoading(true);
       try {
-        if (!bookingId) throw new Error("ID invÃ¡lido");
+        if (!bookingId) throw new Error("ID invalido");
 
         const { data, error } = await supabase
           .from("bookings")
@@ -46,22 +46,25 @@ export function BookingConfirmation() {
 
   if (loading) {
     return (
-      <div className="bg-[#FAF7F2] min-h-screen">
-        <div className="max-w-2xl mx-auto px-4 py-12 space-y-4">
-          <Skeleton className="h-12 w-48 mx-auto" />
-          <Skeleton className="h-6 w-2/3 mx-auto" />
-          <Skeleton className="h-64 w-full" />
+      <PageContainer>
+        <div className="mx-auto max-w-3xl space-y-5">
+          <Skeleton className="mx-auto h-20 w-20 rounded-full" />
+          <Skeleton className="mx-auto h-14 w-72" />
+          <Skeleton className="mx-auto h-6 w-2/3" />
+          <Skeleton className="h-[32rem] w-full rounded-[36px]" />
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   if (!booking) {
     return (
-      <div className="max-w-xl mx-auto px-4 py-16 text-center">
-        <p className="text-[#1C1917]/60 font-['Inter']">Reserva no encontrada.</p>
-        <Button onClick={() => navigate("/mis-reservas")} className="mt-4">Mis reservas</Button>
-      </div>
+      <PageContainer className="flex min-h-[60vh] items-center justify-center">
+        <div className="surface-card max-w-xl rounded-[34px] px-8 py-10 text-center">
+          <p className="text-sm text-[#171616]/62">Reserva no encontrada.</p>
+          <Button onClick={() => navigate("/mis-reservas")} className="mt-5">Mis reservas</Button>
+        </div>
+      </PageContainer>
     );
   }
 
@@ -70,60 +73,83 @@ export function BookingConfirmation() {
     : PLACEHOLDER_IMAGE;
 
   return (
-    <div className="bg-[#FAF7F2] min-h-screen">
-      <div className="max-w-2xl mx-auto px-4 py-12 text-center">
-        <div className="w-20 h-20 bg-[#4A5E3A]/15 rounded-full flex items-center justify-center mx-auto mb-6">
-          <CheckCircle2 size={40} className="text-[#4A5E3A]" />
+    <PageContainer>
+      <section className="mx-auto max-w-4xl section-shell rounded-[40px] px-6 py-8 text-center sm:px-10 sm:py-10">
+        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-[linear-gradient(135deg,#5f6f52_0%,#718361_100%)] text-white shadow-[0_24px_46px_-28px_rgba(95,111,82,0.85)]">
+          <CheckCircle2 size={44} />
         </div>
-        <h1 className="text-3xl font-bold text-[#1C1917] font-['Plus_Jakarta_Sans'] mb-2">Â¡Reserva confirmada!</h1>
-        <p className="text-[#1C1917]/60 font-['Inter'] mb-8">
-          Te enviamos todos los detalles por email y WhatsApp.
+        <Badge variant="success" className="mt-6">Reserva confirmada</Badge>
+        <h1 className="mt-5 font-display text-5xl leading-none text-[#171616] sm:text-6xl">Todo listo para tu proxima reunion.</h1>
+        <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-[#171616]/62 sm:text-base">
+          Confirmamos la reserva y dejamos el detalle centralizado para que el usuario sienta control total despues del pago.
         </p>
+      </section>
 
-        <Card className="p-6 text-left mb-6">
-          <div className="flex gap-4 mb-5">
-            <img src={photo} alt={booking.space?.title ?? "Espacio"} className="w-20 h-16 object-cover rounded-xl flex-shrink-0" />
-            <div>
-              <p className="font-bold text-[#1C1917] font-['Plus_Jakarta_Sans']">{booking.space?.title ?? "Espacio"}</p>
-              <p className="text-sm text-[#C2956B] font-['Inter']">?? {booking.space?.neighborhood ?? "Montevideo"}</p>
+      <div className="mx-auto mt-6 grid max-w-4xl gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <Card className="rounded-[36px] overflow-hidden p-0">
+          <div className="grid gap-0 md:grid-cols-[240px_minmax(0,1fr)]">
+            <img src={photo} alt={booking.space?.title ?? "Espacio"} className="h-64 w-full object-cover md:h-full" />
+            <div className="px-6 py-6 sm:px-8 sm:py-8">
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="default">{booking.space?.neighborhood ?? "Montevideo"}</Badge>
+                <Badge variant="oliva">Pago validado</Badge>
+              </div>
+              <h2 className="mt-4 text-3xl font-semibold text-[#171616]">{booking.space?.title ?? "Espacio"}</h2>
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <InfoCard icon={CalendarDays} label="Fecha" value={formatDate(`${booking.date}T12:00:00`)} />
+                <InfoCard icon={Clock3} label="Horario" value={`${String(booking.start_time).slice(0, 5)} - ${String(booking.end_time).slice(0, 5)}`} />
+                <InfoCard icon={Users} label="Invitados" value={`${booking.guest_count} personas`} />
+                <InfoCard icon={ShieldCheck} label="Total" value={formatUYU(booking.total_charged)} mono />
+              </div>
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <InfoBox label="Fecha" value={formatDate(`${booking.date}T12:00:00`)} />
-            <InfoBox label="Horario" value={`${String(booking.start_time).slice(0, 5)} - ${String(booking.end_time).slice(0, 5)}`} />
-            <InfoBox label="Personas" value={`${booking.guest_count} personas`} />
-            <InfoBox label="Total pagado" value={formatUYU(booking.total_charged)} mono />
           </div>
         </Card>
 
-        <div className="bg-[#1C1917]/5 rounded-2xl p-5 mb-8 text-left">
-          <p className="font-semibold text-[#1C1917] text-sm font-['Inter'] mb-2">?? Instrucciones de acceso</p>
-          <p className="text-sm text-[#1C1917]/60 font-['Inter'] leading-relaxed">
-            El anfitriÃ³n {booking.host?.full_name ?? "del espacio"} te contactarÃ¡ por WhatsApp con los detalles de ingreso antes de la reserva.
-          </p>
-        </div>
+        <div className="space-y-6">
+          <Card className="rounded-[34px] p-6">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-[#171616]/35">Siguiente paso</p>
+            <h2 className="mt-3 text-2xl font-semibold text-[#171616]">Coordinacion con el anfitrion</h2>
+            <p className="mt-3 text-sm leading-relaxed text-[#171616]/62">
+              {booking.host?.full_name ?? "El anfitrion"} recibira la reserva y te contactara con los detalles finales de acceso antes de la fecha.
+            </p>
+          </Card>
 
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Button variant="outline" fullWidth onClick={() => navigate("/mis-reservas")}>
-            Ver mis reservas
-          </Button>
-          <Button fullWidth onClick={() => navigate("/buscar")}>
-            Explorar mÃ¡s espacios
-          </Button>
+          <Card className="rounded-[34px] p-6">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-[#171616]/35">Cobertura</p>
+            <p className="mt-3 text-sm leading-relaxed text-[#171616]/62">
+              Conservamos el rastro de pago, estado de reserva y comprobantes para soporte operativo si lo necesitas.
+            </p>
+          </Card>
+        </div>
+      </div>
+
+      <div className="mx-auto mt-8 flex max-w-4xl flex-col gap-3 sm:flex-row">
+        <Button variant="outline" fullWidth onClick={() => navigate("/mis-reservas")}>
+          Ver mis reservas
+        </Button>
+        <Button fullWidth onClick={() => navigate("/buscar")}>
+          Explorar mas espacios <ArrowRight size={16} />
+        </Button>
+      </div>
+    </PageContainer>
+  );
+}
+
+function InfoCard({ icon, label, value, mono = false }) {
+  return (
+    <div className="rounded-[24px] border border-[#171616]/8 bg-white/75 px-4 py-4">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#171616] text-[#f7f1e8] shadow-[0_16px_26px_-20px_rgba(23,22,22,0.82)]">
+          {createElement(icon, { size: 15 })}
+        </div>
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-[#171616]/35">{label}</p>
+          <p className={`mt-1 text-sm font-semibold text-[#171616] ${mono ? "font-mono" : ""}`}>{value}</p>
         </div>
       </div>
     </div>
   );
 }
 
-function InfoBox({ label, value, mono = false }) {
-  return (
-    <div className="bg-[#FAF7F2] rounded-xl p-3">
-      <p className="text-xs text-[#1C1917]/40 font-['Inter'] mb-0.5">{label}</p>
-      <p className={`text-sm font-bold text-[#1C1917] ${mono ? "font-['JetBrains_Mono']" : "font-['Inter']"}`}>{value}</p>
-    </div>
-  );
-}
-
 export default BookingConfirmation;
+

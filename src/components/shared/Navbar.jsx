@@ -1,8 +1,8 @@
-import { createElement, useState } from "react";
+﻿import { createElement, useMemo, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Flame, ChevronDown, User, CalendarDays, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, Flame, ChevronDown, User, CalendarDays, LogOut, LayoutDashboard, Search, PlusCircle } from "lucide-react";
 import { useApp } from "../../context/AppContext";
-import { Avatar } from "./index";
+import { Avatar, Badge } from "./index";
 import { signOut, supabaseConfigured } from "../../lib/supabase";
 
 export default function Navbar() {
@@ -12,7 +12,8 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
-  const isHost = location.pathname.startsWith("/anfitrion");
+  const isHostArea = location.pathname.startsWith("/anfitrion");
+  const firstName = useMemo(() => state.user?.name?.split(" ")[0] ?? "Perfil", [state.user?.name]);
 
   async function handleLogout() {
     if (supabaseConfigured) {
@@ -23,108 +24,141 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-40 bg-[#FAF7F2]/90 backdrop-blur-md border-b border-[#1C1917]/10">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 font-['Plus_Jakarta_Sans'] font-bold text-xl text-[#1C1917]">
-          <Flame size={24} className="text-[#D4541B]" />
-          <span>Prende</span>
+    <nav className="sticky top-0 z-40 border-b border-[#171616]/8 bg-[#f7f1e8]/70 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+        <Link to="/" className="glass-shell flex items-center gap-3 rounded-full px-4 py-2.5 transition hover:-translate-y-0.5">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#171616] text-[#f7f1e8] shadow-[0_16px_28px_-22px_rgba(23,22,22,0.85)]">
+            <Flame size={18} />
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.18em] text-[#171616]/40">Marketplace</p>
+            <p className="text-lg font-bold text-[#171616]">Prende</p>
+          </div>
         </Link>
 
-        {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-6">
-          {!isHost && (
-            <Link to="/buscar" className="text-sm font-medium text-[#1C1917]/70 hover:text-[#1C1917] transition-colors font-['Inter']">
-              Explorar espacios
-            </Link>
-          )}
+        <div className="hidden items-center gap-2 lg:flex">
+          <NavPill to="/buscar" active={location.pathname.startsWith("/buscar") || location.pathname.startsWith("/espacio") || location.pathname.startsWith("/reservar")} icon={Search}>
+            Explorar
+          </NavPill>
           {state.user?.isHost && (
-            <Link
-              to="/anfitrion/dashboard"
-              className="text-sm font-medium text-[#1C1917]/70 hover:text-[#1C1917] transition-colors font-['Inter']"
-            >
-              Mi espacio
+            <NavPill to="/anfitrion/dashboard" active={isHostArea} icon={LayoutDashboard}>
+              Anfitrion
+            </NavPill>
+          )}
+          {!state.user?.isHost && (
+            <Link to="/login?mode=register" className="inline-flex items-center gap-2 rounded-full border border-[#171616]/10 bg-white/80 px-4 py-2.5 text-sm font-medium text-[#171616] shadow-[0_12px_28px_-24px_rgba(23,22,22,0.6)] transition hover:-translate-y-0.5 hover:bg-white">
+              <PlusCircle size={15} />
+              Publicar espacio
             </Link>
           )}
         </div>
 
-        {/* Actions */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden items-center gap-3 md:flex">
           {state.user ? (
             <div className="relative">
               <button
-                onClick={() => setProfileOpen(!profileOpen)}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-[#1C1917]/8 transition-colors"
+                onClick={() => setProfileOpen((open) => !open)}
+                className="glass-shell flex items-center gap-3 rounded-full px-3 py-2.5 transition hover:-translate-y-0.5"
               >
                 <Avatar src={state.user.avatar} name={state.user.name} size="sm" />
-                <span className="text-sm font-medium text-[#1C1917] font-['Inter']">{state.user.name.split(" ")[0]}</span>
-                <ChevronDown size={14} className="text-[#1C1917]/50" />
+                <div className="text-left">
+                  <p className="text-xs text-[#171616]/45">Cuenta activa</p>
+                  <p className="text-sm font-semibold text-[#171616]">{firstName}</p>
+                </div>
+                <ChevronDown size={16} className="text-[#171616]/50" />
               </button>
 
               {profileOpen && (
-                <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-[#1C1917]/10 py-2 z-50">
-                  <DropItem icon={User} label="Mi perfil" onClick={() => { navigate("/perfil"); setProfileOpen(false); }} />
-                  <DropItem icon={CalendarDays} label="Mis reservas" onClick={() => { navigate("/mis-reservas"); setProfileOpen(false); }} />
-                  {state.user.isHost && (
-                    <DropItem icon={LayoutDashboard} label="Panel anfitrión" onClick={() => { navigate("/anfitrion/dashboard"); setProfileOpen(false); }} />
-                  )}
-                  <div className="my-1 border-t border-[#1C1917]/10" />
-                  <DropItem icon={LogOut} label="Cerrar sesión" onClick={handleLogout} danger />
+                <div className="surface-card absolute right-0 top-full mt-3 w-72 rounded-[28px] p-3">
+                  <div className="rounded-[24px] bg-[#171616] px-4 py-4 text-[#f7f1e8]">
+                    <p className="text-xs uppercase tracking-[0.16em] text-[#f7f1e8]/48">Sesion</p>
+                    <p className="mt-2 text-lg font-semibold">{state.user.name}</p>
+                    <p className="mt-1 text-sm text-[#f7f1e8]/68">{state.user.email}</p>
+                    {state.user.isHost && <Badge className="mt-3 border-white/10 bg-white/10 text-white">Host activo</Badge>}
+                  </div>
+                  <div className="mt-3 space-y-1">
+                    <DropItem icon={User} label="Mi perfil" onClick={() => { navigate("/perfil"); setProfileOpen(false); }} />
+                    <DropItem icon={CalendarDays} label="Mis reservas" onClick={() => { navigate("/mis-reservas"); setProfileOpen(false); }} />
+                    {state.user.isHost && (
+                      <DropItem icon={LayoutDashboard} label="Panel anfitrion" onClick={() => { navigate("/anfitrion/dashboard"); setProfileOpen(false); }} />
+                    )}
+                    <div className="my-2 h-px bg-[#171616]/8" />
+                    <DropItem icon={LogOut} label="Cerrar sesion" onClick={handleLogout} danger />
+                  </div>
                 </div>
               )}
             </div>
           ) : (
-            <>
-              <Link to="/login" className="text-sm font-medium text-[#1C1917] hover:underline font-['Inter']">Entrar</Link>
-              <Link
-                to="/login?mode=register"
-                className="bg-[#D4541B] text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-[#B8441A] transition-colors font-['Inter']"
-              >
-                Publicar espacio
+            <div className="flex items-center gap-3">
+              <Link to="/login" className="text-sm font-medium text-[#171616]/70 transition hover:text-[#171616]">
+                Entrar
               </Link>
-            </>
+              <Link to="/login?mode=register" className="inline-flex items-center rounded-full bg-[#171616] px-5 py-3 text-sm font-semibold text-[#f7f1e8] shadow-[0_16px_28px_-20px_rgba(23,22,22,0.82)] transition hover:-translate-y-0.5 hover:bg-[#24211f]">
+                Crear cuenta
+              </Link>
+            </div>
           )}
         </div>
 
-        {/* Mobile hamburger */}
-        <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2 rounded-lg hover:bg-[#1C1917]/8">
-          {menuOpen ? <X size={22} /> : <Menu size={22} />}
+        <button
+          type="button"
+          onClick={() => setMenuOpen((open) => !open)}
+          className="flex h-12 w-12 items-center justify-center rounded-full border border-[#171616]/10 bg-white/75 text-[#171616] shadow-[0_12px_30px_-24px_rgba(23,22,22,0.65)] md:hidden"
+          aria-label="Menu"
+        >
+          {menuOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
       </div>
 
-      {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden bg-white border-t border-[#1C1917]/10 px-4 py-4 flex flex-col gap-3">
-          <MobileLink to="/buscar" onClick={() => setMenuOpen(false)}>Explorar espacios</MobileLink>
-          {state.user ? (
-            <>
-              <MobileLink to="/mis-reservas" onClick={() => setMenuOpen(false)}>Mis reservas</MobileLink>
-              <MobileLink to="/perfil" onClick={() => setMenuOpen(false)}>Mi perfil</MobileLink>
-              {state.user.isHost && (
-                <MobileLink to="/anfitrion/dashboard" onClick={() => setMenuOpen(false)}>Panel anfitrión</MobileLink>
+        <div className="px-4 pb-4 md:hidden sm:px-6">
+          <div className="surface-card rounded-[28px] p-4">
+            <div className="space-y-2">
+              <MobileLink to="/buscar" onClick={() => setMenuOpen(false)} icon={Search}>Explorar espacios</MobileLink>
+              {state.user ? (
+                <>
+                  <MobileLink to="/mis-reservas" onClick={() => setMenuOpen(false)} icon={CalendarDays}>Mis reservas</MobileLink>
+                  <MobileLink to="/perfil" onClick={() => setMenuOpen(false)} icon={User}>Mi perfil</MobileLink>
+                  {state.user.isHost && (
+                    <MobileLink to="/anfitrion/dashboard" onClick={() => setMenuOpen(false)} icon={LayoutDashboard}>Panel anfitrion</MobileLink>
+                  )}
+                  <button type="button" onClick={handleLogout} className="flex w-full items-center gap-3 rounded-[20px] px-4 py-3 text-left text-sm font-medium text-red-600 transition hover:bg-red-50">
+                    <LogOut size={16} />
+                    Cerrar sesion
+                  </button>
+                </>
+              ) : (
+                <>
+                  <MobileLink to="/login" onClick={() => setMenuOpen(false)} icon={User}>Entrar</MobileLink>
+                  <MobileLink to="/login?mode=register" onClick={() => setMenuOpen(false)} icon={PlusCircle}>Publicar espacio</MobileLink>
+                </>
               )}
-              <button onClick={handleLogout} className="text-left text-sm font-medium text-red-600 py-2 font-['Inter']">
-                Cerrar sesión
-              </button>
-            </>
-          ) : (
-            <>
-              <MobileLink to="/login" onClick={() => setMenuOpen(false)}>Entrar</MobileLink>
-              <MobileLink to="/login?mode=register" onClick={() => setMenuOpen(false)}>Publicar espacio</MobileLink>
-            </>
-          )}
+            </div>
+          </div>
         </div>
       )}
     </nav>
   );
 }
 
+function NavPill({ to, active, icon, children }) {
+  return (
+    <Link
+      to={to}
+      className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${active ? "bg-[#171616] text-[#f7f1e8] shadow-[0_16px_28px_-20px_rgba(23,22,22,0.82)]" : "text-[#171616]/70 hover:bg-white/70 hover:text-[#171616]"}`}
+    >
+      {createElement(icon, { size: 15 })}
+      {children}
+    </Link>
+  );
+}
+
 function DropItem({ icon, label, onClick, danger = false }) {
   return (
     <button
+      type="button"
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-[#FAF7F2] transition-colors font-['Inter'] ${danger ? "text-red-600" : "text-[#1C1917]"}`}
+      className={`flex w-full items-center gap-3 rounded-[20px] px-4 py-3 text-left text-sm font-medium transition ${danger ? "text-red-600 hover:bg-red-50" : "text-[#171616] hover:bg-[#171616]/4"}`}
     >
       {createElement(icon, { size: 16 })}
       {label}
@@ -132,13 +166,10 @@ function DropItem({ icon, label, onClick, danger = false }) {
   );
 }
 
-function MobileLink({ to, children, onClick }) {
+function MobileLink({ to, children, onClick, icon }) {
   return (
-    <Link
-      to={to}
-      onClick={onClick}
-      className="block text-sm font-medium text-[#1C1917] py-2 border-b border-[#1C1917]/8 font-['Inter']"
-    >
+    <Link to={to} onClick={onClick} className="flex items-center gap-3 rounded-[20px] px-4 py-3 text-sm font-medium text-[#171616] transition hover:bg-[#171616]/4">
+      {createElement(icon, { size: 16 })}
       {children}
     </Link>
   );

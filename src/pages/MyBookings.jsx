@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Button, Card, StatusBadge, EmptyState, PageContainer, SectionTitle, Skeleton } from "../components/shared";
+import { CalendarDays, Clock3, Ticket, ArrowUpRight, WalletCards } from "lucide-react";
+import { Button, Card, StatusBadge, EmptyState, PageContainer, SectionTitle, Skeleton, Badge } from "../components/shared";
 import { getTicketInstructions } from "../lib/payments";
 import { formatUYU, formatDate } from "../lib/utils";
 import { getMyBookings } from "../lib/supabase";
@@ -51,7 +52,7 @@ export default function MyBookings() {
     const base = bookingId ? `Reserva ${bookingId.slice(0, 8)}.` : "Tu reserva.";
 
     if (payment === "success") return { type: "success", text: `${base} Pago acreditado correctamente.` };
-    if (payment === "pending") return { type: "warning", text: `${base} Pago pendiente de confirmaciÃ³n.` };
+    if (payment === "pending") return { type: "warning", text: `${base} Pago pendiente de confirmacion.` };
     if (payment === "failure") return { type: "danger", text: `${base} El pago no pudo completarse.` };
     return null;
   }, [searchParams]);
@@ -71,7 +72,7 @@ export default function MyBookings() {
   });
 
   async function handleCancel(bookingId) {
-    const confirmed = window.confirm("Â¿Seguro que querÃ©s cancelar esta reserva?");
+    const confirmed = window.confirm("Seguro que quieres cancelar esta reserva?");
     if (!confirmed) return;
 
     setActionLoadingId(bookingId);
@@ -94,79 +95,94 @@ export default function MyBookings() {
 
   return (
     <PageContainer>
-      <SectionTitle sub="Historial completo de tus reservas en Prende">Mis reservas</SectionTitle>
+      <section className="section-shell rounded-[40px] px-5 py-6 sm:px-8 sm:py-8">
+        <SectionTitle sub="Estado, comprobantes y proximos pasos dentro de una vista mas ejecutiva del viaje de reserva." className="mb-0">
+          Mis reservas
+        </SectionTitle>
+      </section>
 
       {paymentMessage && (
-        <div className={`mb-6 rounded-xl border px-4 py-3 text-sm font-['Inter'] ${paymentMessage.type === "success" ? "bg-green-50 border-green-200 text-green-700" : paymentMessage.type === "warning" ? "bg-amber-50 border-amber-200 text-amber-700" : "bg-red-50 border-red-200 text-red-700"}`}>
+        <div className={`mt-6 rounded-[26px] border px-4 py-4 text-sm ${paymentMessage.type === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-700" : paymentMessage.type === "warning" ? "border-amber-200 bg-amber-50 text-amber-700" : "border-red-200 bg-red-50 text-red-700"}`}>
           {paymentMessage.text}
         </div>
       )}
 
       {error && (
-        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 font-['Inter']">
+        <div className="mt-6 rounded-[26px] border border-red-200 bg-red-50 px-4 py-4 text-sm text-red-700">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div className="space-y-3">
-          {Array.from({ length: 4 }).map((_, idx) => (
-            <Card key={idx} className="p-4">
+        <div className="mt-6 space-y-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Card key={index} className="rounded-[34px] p-4">
               <div className="flex gap-4">
-                <Skeleton className="w-24 h-20 rounded-xl" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-3 w-1/3" />
-                  <Skeleton className="h-3 w-2/3" />
+                <Skeleton className="h-24 w-28 rounded-[22px]" />
+                <div className="flex-1 space-y-3 py-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-8 w-2/3" />
+                  <Skeleton className="h-4 w-full" />
                 </div>
               </div>
             </Card>
           ))}
         </div>
       ) : bookings.length === 0 ? (
-        <EmptyState
-          icon="??"
-          title="No tenÃ©s reservas aÃºn"
-          description="ExplorÃ¡ los mejores espacios con parrilla en Montevideo y hacÃ© tu primera reserva."
-          action={<Button onClick={() => navigate("/buscar")}>Explorar espacios</Button>}
-        />
+        <div className="mt-6">
+          <EmptyState
+            icon="-"
+            title="Todavia no tienes reservas"
+            description="Explora espacios, compara zonas y prepara tu primera reserva con una experiencia de pago mas robusta."
+            action={<Button onClick={() => navigate("/buscar")}>Explorar espacios</Button>}
+          />
+        </div>
       ) : (
-        <div className="space-y-8">
+        <div className="mt-8 space-y-10">
           {upcoming.length > 0 && (
-            <div>
-              <h2 className="text-lg font-bold text-[#1C1917] font-['Plus_Jakarta_Sans'] mb-4">PrÃ³ximas</h2>
-              <div className="space-y-3">
-                {upcoming.map((booking) => (
-                  <BookingRow
-                    key={booking.id}
-                    booking={booking}
-                    navigate={navigate}
-                    onCancel={handleCancel}
-                    cancelling={actionLoadingId === booking.id}
-                  />
-                ))}
-              </div>
-            </div>
+            <SectionBlock title="Proximas" subtitle="Reservas activas o pendientes de acreditacion.">
+              {upcoming.map((booking) => (
+                <BookingRow
+                  key={booking.id}
+                  booking={booking}
+                  navigate={navigate}
+                  onCancel={handleCancel}
+                  cancelling={actionLoadingId === booking.id}
+                />
+              ))}
+            </SectionBlock>
           )}
 
           {past.length > 0 && (
-            <div>
-              <h2 className="text-lg font-bold text-[#1C1917] font-['Plus_Jakarta_Sans'] mb-4">Historial</h2>
-              <div className="space-y-3">
-                {past.map((booking) => (
-                  <BookingRow
-                    key={booking.id}
-                    booking={booking}
-                    navigate={navigate}
-                    past
-                  />
-                ))}
-              </div>
-            </div>
+            <SectionBlock title="Historial" subtitle="Reservas cerradas, canceladas o ya disfrutadas.">
+              {past.map((booking) => (
+                <BookingRow
+                  key={booking.id}
+                  booking={booking}
+                  navigate={navigate}
+                  past
+                />
+              ))}
+            </SectionBlock>
           )}
         </div>
       )}
     </PageContainer>
+  );
+}
+
+function SectionBlock({ title, subtitle, children }) {
+  return (
+    <section>
+      <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-[#171616]/35">Panel</p>
+          <h2 className="mt-2 text-3xl font-semibold text-[#171616]">{title}</h2>
+        </div>
+        <p className="max-w-xl text-sm leading-relaxed text-[#171616]/58">{subtitle}</p>
+      </div>
+      <div className="space-y-4">{children}</div>
+    </section>
   );
 }
 
@@ -181,70 +197,91 @@ function BookingRow({ booking, navigate, past = false, onCancel, cancelling = fa
   const status = booking.payment_status === "rejected"
     ? "rejected"
     : booking.payment_status === "pending" && booking.status === "pending"
-    ? "pending"
-    : booking.status;
+      ? "pending"
+      : booking.status;
 
   const showCancel = !past && ["pending", "paid", "confirmed"].includes(booking.status);
   const showReview = past && booking.status === "completed";
   const showVoucher = Boolean(ticketInstructions.ticketUrl) && isTicketPending;
 
   return (
-    <Card className="p-4">
-      <div className="flex gap-4">
-        <img src={image} alt={booking?.space?.title ?? "Espacio"} className="w-20 h-16 sm:w-24 sm:h-20 object-cover rounded-xl flex-shrink-0" />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2 mb-1">
-            <p className="font-bold text-[#1C1917] text-sm font-['Plus_Jakarta_Sans'] line-clamp-1">{booking?.space?.title ?? "Espacio"}</p>
+    <Card className="rounded-[34px] overflow-hidden p-0">
+      <div className="grid gap-0 lg:grid-cols-[240px_minmax(0,1fr)]">
+        <img src={image} alt={booking?.space?.title ?? "Espacio"} className="h-60 w-full object-cover lg:h-full" />
+        <div className="px-5 py-5 sm:px-6 sm:py-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="default">{booking?.space?.neighborhood ?? "Montevideo"}</Badge>
+                {isTicketPending && <Badge variant="warning">Ticket pendiente</Badge>}
+              </div>
+              <h3 className="mt-4 text-2xl font-semibold text-[#171616]">{booking?.space?.title ?? "Espacio"}</h3>
+              <div className="mt-4 flex flex-wrap gap-3 text-sm text-[#171616]/58">
+                <span className="inline-flex items-center gap-2"><CalendarDays size={14} /> {formatDate(`${booking.date}T12:00:00`)}</span>
+                <span className="inline-flex items-center gap-2"><Clock3 size={14} /> {normalizeTime(booking.start_time)} - {normalizeTime(booking.end_time)}</span>
+                <span className="inline-flex items-center gap-2"><WalletCards size={14} /> {formatUYU(booking.total_charged)}</span>
+              </div>
+            </div>
             <StatusBadge status={status} />
           </div>
-          <p className="text-xs text-[#C2956B] font-['Inter'] mb-2">?? {booking?.space?.neighborhood ?? "Montevideo"}</p>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#1C1917]/50 font-['Inter']">
-            <span>?? {formatDate(`${booking.date}T12:00:00`)}</span>
-            <span>?? {normalizeTime(booking.start_time)} - {normalizeTime(booking.end_time)}</span>
-            <span>?? {booking.guest_count} personas</span>
-            <span className="font-['JetBrains_Mono'] font-semibold text-[#1C1917]">{formatUYU(booking.total_charged)}</span>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            <InfoCell label="Invitados" value={`${booking.guest_count} personas`} />
+            <InfoCell label="Pago" value={booking.payment_method_type === "ticket" ? "Red local" : booking.payment_method_type === "account_money" ? "Wallet" : "Tarjeta"} />
+            <InfoCell label="Reserva" value={booking.id.slice(0, 8)} mono />
           </div>
+
+          {isTicketPending && (
+            <div className="mt-5 rounded-[26px] border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-800">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+                  <Ticket size={16} />
+                </div>
+                <div>
+                  <p className="font-semibold">Completa el pago en {ticketInstructions.methodLabel}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-amber-700">
+                    Vence: {formatPendingDate(ticketInstructions.expiresAt)}
+                    {ticketInstructions.reference ? ` · Ref. ${ticketInstructions.reference}` : ""}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {(showCancel || showReview || showVoucher) && (
+            <div className="mt-5 flex flex-col gap-3 border-t border-[#171616]/8 pt-5 sm:flex-row sm:justify-end">
+              {showVoucher && (
+                <Button size="sm" variant="outline" onClick={() => window.open(ticketInstructions.ticketUrl ?? "", "_blank", "noopener,noreferrer")}>
+                  Ver comprobante
+                </Button>
+              )}
+              {showCancel && (
+                <Button size="sm" variant="danger" loading={cancelling} onClick={() => onCancel?.(booking.id)}>
+                  Cancelar
+                </Button>
+              )}
+              {showReview && (
+                <Button size="sm" onClick={() => navigate(`/reseña/${booking.id}`)}>
+                  Dejar reseña
+                </Button>
+              )}
+              <Button size="sm" variant="outline" onClick={() => navigate(`/espacio/${booking.space_id}`)}>
+                Ver espacio <ArrowUpRight size={14} />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
-
-      {isTicketPending && (
-        <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3">
-          <p className="text-sm font-semibold text-amber-800 font-['Inter']">
-            Completa el pago en {ticketInstructions.methodLabel}
-          </p>
-          <p className="mt-1 text-xs text-amber-700 font-['Inter']">
-            Vence: {formatPendingDate(ticketInstructions.expiresAt)}
-            {ticketInstructions.reference ? ` · Ref. ${ticketInstructions.reference}` : ""}
-          </p>
-        </div>
-      )}
-
-      {(showCancel || showReview || showVoucher) && (
-        <div className="mt-3 pt-3 border-t border-[#1C1917]/8 flex justify-end gap-2">
-          {showVoucher && (
-            <Button size="sm" variant="outline" onClick={() => window.open(ticketInstructions.ticketUrl ?? "", "_blank", "noopener,noreferrer")}>
-              Ver comprobante
-            </Button>
-          )}
-
-          {showCancel && (
-            <Button size="sm" variant="danger" loading={cancelling} onClick={() => onCancel?.(booking.id)}>
-              Cancelar
-            </Button>
-          )}
-
-          {showReview && (
-            <Button size="sm" onClick={() => navigate(`/reseÃ±a/${booking.id}`)}>
-              Dejar reseÃ±a
-            </Button>
-          )}
-
-          <Button size="sm" variant="outline" onClick={() => navigate(`/espacio/${booking.space_id}`)}>
-            Ver espacio
-          </Button>
-        </div>
-      )}
     </Card>
+  );
+}
+
+function InfoCell({ label, value, mono = false }) {
+  return (
+    <div className="rounded-[22px] border border-[#171616]/8 bg-white/75 px-4 py-4">
+      <p className="text-[11px] uppercase tracking-[0.18em] text-[#171616]/35">{label}</p>
+      <p className={`mt-1 text-sm font-semibold text-[#171616] ${mono ? "font-mono" : ""}`}>{value}</p>
+    </div>
   );
 }
 
