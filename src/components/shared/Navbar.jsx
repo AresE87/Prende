@@ -24,10 +24,10 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-[#171616]/8 bg-[#f7f1e8]/70 backdrop-blur-xl">
+    <nav className="sticky top-0 z-40 border-b border-[#171616]/6 bg-[#f8f3ea]/72 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        <Link to="/" className="glass-shell flex items-center gap-3 rounded-full px-4 py-2.5 transition hover:-translate-y-0.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#171616] text-[#f7f1e8] shadow-[0_16px_28px_-22px_rgba(23,22,22,0.85)]">
+        <Link to="/" className="glass-shell subtle-hover flex items-center gap-3 rounded-full px-4 py-2.5 transition">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#241f1b] text-[#f7f1e8] shadow-[0_16px_28px_-22px_rgba(43,36,31,0.56)]">
             <Flame size={18} />
           </div>
           <div>
@@ -46,7 +46,7 @@ export default function Navbar() {
             </NavPill>
           )}
           {!state.user?.isHost && (
-            <Link to="/login?mode=register" className="inline-flex items-center gap-2 rounded-full border border-[#171616]/10 bg-white/80 px-4 py-2.5 text-sm font-medium text-[#171616] shadow-[0_12px_28px_-24px_rgba(23,22,22,0.6)] transition hover:-translate-y-0.5 hover:bg-white">
+            <Link to="/login?mode=register" className="subtle-hover inline-flex items-center gap-2 rounded-full border border-[#171616]/10 bg-white/78 px-4 py-2.5 text-sm font-medium text-[#171616] shadow-[0_12px_28px_-24px_rgba(73,52,40,0.22)] transition hover:bg-white/92">
               <PlusCircle size={15} />
               Publicar espacio
             </Link>
@@ -58,7 +58,7 @@ export default function Navbar() {
             <div className="relative">
               <button
                 onClick={() => setProfileOpen((open) => !open)}
-                className="glass-shell flex items-center gap-3 rounded-full px-3 py-2.5 transition hover:-translate-y-0.5"
+                className="glass-shell subtle-hover flex items-center gap-3 rounded-full px-3 py-2.5 transition"
               >
                 <Avatar src={state.user.avatar} name={state.user.name} size="sm" />
                 <div className="text-left">
@@ -70,7 +70,7 @@ export default function Navbar() {
 
               {profileOpen && (
                 <div className="surface-card absolute right-0 top-full mt-3 w-72 rounded-[28px] p-3">
-                  <div className="rounded-[24px] bg-[#171616] px-4 py-4 text-[#f7f1e8]">
+                  <div className="rounded-[24px] bg-[linear-gradient(135deg,#241f1b_0%,#342c27_100%)] px-4 py-4 text-[#f7f1e8]">
                     <p className="text-xs uppercase tracking-[0.16em] text-[#f7f1e8]/48">Sesion</p>
                     <p className="mt-2 text-lg font-semibold">{state.user.name}</p>
                     <p className="mt-1 text-sm text-[#f7f1e8]/68">{state.user.email}</p>
@@ -93,7 +93,7 @@ export default function Navbar() {
               <Link to="/login" className="text-sm font-medium text-[#171616]/70 transition hover:text-[#171616]">
                 Entrar
               </Link>
-              <Link to="/login?mode=register" className="inline-flex items-center rounded-full bg-[#171616] px-5 py-3 text-sm font-semibold text-[#f7f1e8] shadow-[0_16px_28px_-20px_rgba(23,22,22,0.82)] transition hover:-translate-y-0.5 hover:bg-[#24211f]">
+              <Link to="/login?mode=register" className="subtle-hover inline-flex items-center rounded-full bg-[linear-gradient(135deg,#2a241f_0%,#39302a_100%)] px-5 py-3 text-sm font-semibold text-[#f7f1e8] shadow-[0_16px_28px_-20px_rgba(43,36,31,0.48)] transition">
                 Crear cuenta
               </Link>
             </div>
@@ -145,7 +145,7 @@ function NavPill({ to, active, icon, children }) {
   return (
     <Link
       to={to}
-      className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${active ? "bg-[#171616] text-[#f7f1e8] shadow-[0_16px_28px_-20px_rgba(23,22,22,0.82)]" : "text-[#171616]/70 hover:bg-white/70 hover:text-[#171616]"}`}
+      className={`subtle-hover inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${active ? "bg-[linear-gradient(135deg,#2a241f_0%,#39302a_100%)] text-[#f7f1e8] shadow-[0_16px_28px_-20px_rgba(43,36,31,0.48)]" : "text-[#171616]/70 hover:bg-white/70 hover:text-[#171616]"}`}
     >
       {createElement(icon, { size: 15 })}
       {children}

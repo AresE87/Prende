@@ -11,12 +11,12 @@ export function Button({
   className = "",
   ...props
 }) {
-  const base = "inline-flex items-center justify-center gap-2 rounded-full border text-sm font-semibold transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-55 focus:outline-none focus:ring-2 focus:ring-[#d5632a]/40 focus:ring-offset-2 focus:ring-offset-transparent";
+  const base = "subtle-hover inline-flex items-center justify-center gap-2 rounded-full border text-sm font-semibold transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-55 focus:outline-none focus:ring-2 focus:ring-[#d5632a]/40 focus:ring-offset-2 focus:ring-offset-transparent";
 
   const variants = {
-    primary: "border-[#d5632a] bg-[linear-gradient(135deg,#df7137_0%,#c95422_100%)] text-white shadow-[0_18px_35px_-24px_rgba(213,99,42,0.9)] hover:-translate-y-0.5 hover:shadow-[0_22px_44px_-24px_rgba(213,99,42,0.75)] active:translate-y-0",
-    secondary: "border-[#171616] bg-[#171616] text-[#f8f3ea] shadow-[0_18px_36px_-26px_rgba(23,22,22,0.82)] hover:-translate-y-0.5 hover:bg-[#24211f]",
-    outline: "border-[#171616]/14 bg-white/75 text-[#171616] shadow-[0_10px_30px_-26px_rgba(23,22,22,0.55)] hover:-translate-y-0.5 hover:border-[#171616]/28 hover:bg-white",
+    primary: "border-[#d5632a]/70 bg-[linear-gradient(135deg,#dc7c4d_0%,#c95f31_100%)] text-white shadow-[0_18px_35px_-24px_rgba(213,99,42,0.62)] hover:shadow-[0_24px_46px_-24px_rgba(213,99,42,0.52)] active:translate-y-0",
+    secondary: "border-[#2b241f]/85 bg-[linear-gradient(135deg,#2b241f_0%,#3a312b_100%)] text-[#f8f3ea] shadow-[0_18px_36px_-26px_rgba(43,36,31,0.52)] hover:bg-[linear-gradient(135deg,#342b25_0%,#433832_100%)]",
+    outline: "border-[#171616]/10 bg-white/70 text-[#171616] shadow-[0_12px_28px_-26px_rgba(73,52,40,0.26)] hover:border-[#171616]/18 hover:bg-white/88 hover:shadow-[0_18px_34px_-28px_rgba(73,52,40,0.22)]",
     ghost: "border-transparent bg-transparent text-[#171616] hover:bg-[#171616]/6",
     danger: "border-red-600 bg-red-600 text-white shadow-[0_18px_35px_-24px_rgba(220,38,38,0.7)] hover:-translate-y-0.5 hover:bg-red-700",
     success: "border-[#5f6f52] bg-[#5f6f52] text-white shadow-[0_18px_35px_-24px_rgba(95,111,82,0.72)] hover:-translate-y-0.5 hover:bg-[#516145]",
@@ -225,7 +225,7 @@ export function Card({ children, className = "", hover = false, ...props }) {
     <div
       className={cn(
         "surface-card rounded-[30px] p-0",
-        hover && "transition duration-300 hover:-translate-y-1 hover:shadow-[0_28px_70px_-40px_rgba(23,22,22,0.34)]",
+        hover && "surface-card-hover",
         className,
       )}
       {...props}

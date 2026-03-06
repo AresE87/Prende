@@ -21,9 +21,9 @@ export default function Navbar() {
 
   return (
     <nav className="fixed left-0 right-0 top-4 z-50 px-4 sm:px-6">
-      <div className={`mx-auto flex max-w-6xl items-center justify-between rounded-full px-4 py-3 transition duration-500 sm:px-5 ${scrolled ? "glass-shell shadow-[0_20px_44px_-30px_rgba(23,22,22,0.52)]" : "bg-transparent"}`}>
-        <a href="#" className="flex items-center gap-3 rounded-full px-1 py-1">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#171616] text-[#f7f1e8] shadow-[0_16px_26px_-20px_rgba(23,22,22,0.85)]">
+      <div className={`mx-auto flex max-w-6xl items-center justify-between rounded-full px-4 py-3 transition duration-500 sm:px-5 ${scrolled ? "glass-shell shadow-[0_20px_40px_-30px_rgba(73,52,40,0.28)]" : "bg-transparent"}`}>
+        <a href="#" className="subtle-hover flex items-center gap-3 rounded-full px-1 py-1">
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#241f1b] text-[#f7f1e8] shadow-[0_16px_26px_-20px_rgba(43,36,31,0.58)]">
             <Flame size={18} />
           </div>
           <div>
@@ -41,11 +41,11 @@ export default function Navbar() {
         </div>
 
         <div className="hidden items-center gap-3 sm:flex">
-          <Link to="/login" className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${scrolled ? "text-[#171616]/72 hover:text-[#171616]" : "text-white/82 hover:text-white"}`}>
+          <Link to="/login" className={`subtle-hover inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${scrolled ? "text-[#171616]/72 hover:text-[#171616]" : "text-white/82 hover:text-white"}`}>
             <User size={14} />
             Entrar
           </Link>
-          <a href="#reserva" className="inline-flex items-center gap-2 rounded-full bg-[#d5632a] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_34px_-22px_rgba(213,99,42,0.82)] transition hover:-translate-y-0.5 hover:bg-[#c75424]">
+          <a href="#reserva" className="subtle-hover inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#dc7c4d_0%,#c95f31_100%)] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_34px_-24px_rgba(213,99,42,0.56)] transition hover:bg-[linear-gradient(135deg,#e08a5d_0%,#cd6b41_100%)]">
             Reservar
             <ArrowRight size={14} />
           </a>
@@ -77,7 +77,7 @@ export default function Navbar() {
               <Link to="/login" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-[20px] px-4 py-3 text-sm font-medium text-[#171616] transition hover:bg-[#171616]/4">
                 <User size={15} /> Entrar
               </Link>
-              <a href="#reserva" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-2 rounded-full bg-[#171616] px-5 py-3 text-sm font-semibold text-[#f7f1e8] shadow-[0_16px_28px_-20px_rgba(23,22,22,0.82)]">
+              <a href="#reserva" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-2 rounded-full bg-[#241f1b] px-5 py-3 text-sm font-semibold text-[#f7f1e8] shadow-[0_16px_28px_-20px_rgba(43,36,31,0.56)]">
                 Reservar ahora
                 <ArrowRight size={14} />
               </a>

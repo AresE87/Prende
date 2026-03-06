@@ -185,6 +185,29 @@ Si retomas desde otra PC, el orden recomendado es:
 5. revisar deploy de Vercel
 6. continuar sobre el sistema visual ya creado, no volver al estilo anterior
 
+## Ajuste posterior: contraste y hover
+
+Despues del primer rediseño se hizo una segunda pasada para bajar dureza visual y sumar microinteracciones.
+
+Cambios aplicados:
+
+- se suavizo el contraste global entre fondos crema y superficies oscuras
+- se aflojaron sombras, bordes y gradientes para evitar sensacion demasiado rigida
+- se agregaron clases reutilizables de hover:
+  - `surface-card-hover`
+  - `subtle-hover`
+- se aplicaron hover states mas premium en:
+  - cards de espacios
+  - CTAs principales
+  - navbar de landing y navbar de app
+  - metricas y stats visuales
+
+Objetivo de este ajuste:
+
+- conservar presencia de marca sin que el negro compita tanto con el fondo
+- dar respuesta visual al mouse sin caer en animaciones exageradas
+- hacer que la UI se sienta mas viva y menos estatica
+
 ## Como seguiria yo este rediseño
 
 ### 1. Host flows

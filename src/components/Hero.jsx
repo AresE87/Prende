@@ -26,14 +26,14 @@ export default function Hero() {
           alt="Personas compartiendo un asado"
           className="h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(23,22,22,0.3)_0%,rgba(23,22,22,0.76)_58%,rgba(23,22,22,0.92)_100%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(213,99,42,0.28),transparent_24%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(35,29,25,0.18)_0%,rgba(35,29,25,0.6)_56%,rgba(35,29,25,0.8)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(213,99,42,0.2),transparent_24%)]" />
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-16 pt-32 sm:px-8 sm:pb-20 lg:pb-24">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
           <div className="max-w-4xl">
-            <div className="hero-badge inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-4 py-2 text-white/88 backdrop-blur-md">
+            <div className="hero-badge inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/9 px-4 py-2 text-white/84 backdrop-blur-md">
               <Flame className="h-4 w-4 text-[#d5632a]" />
               <span className="text-xs font-medium uppercase tracking-[0.18em]">Pagos, reservas y experiencia en una sola plataforma</span>
             </div>
@@ -52,11 +52,11 @@ export default function Hero() {
             </p>
 
             <div className="hero-cta mt-8 flex flex-wrap gap-3">
-              <a href="#reserva" className="inline-flex items-center gap-2 rounded-full bg-[#d5632a] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_22px_40px_-24px_rgba(213,99,42,0.82)] transition hover:-translate-y-0.5 hover:bg-[#c75424]">
+              <a href="#reserva" className="subtle-hover inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#dc7c4d_0%,#c95f31_100%)] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_22px_40px_-24px_rgba(213,99,42,0.56)] transition hover:bg-[linear-gradient(135deg,#e08a5d_0%,#cd6b41_100%)]">
                 Reservar ahora
                 <ArrowRight size={15} />
               </a>
-              <a href="#como-funciona" className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/10 px-6 py-3.5 text-sm font-medium text-white backdrop-blur-md transition hover:bg-white/16">
+              <a href="#como-funciona" className="subtle-hover inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/9 px-6 py-3.5 text-sm font-medium text-white backdrop-blur-md transition hover:bg-white/14">
                 Ver como funciona
               </a>
             </div>
@@ -75,9 +75,9 @@ export default function Hero() {
 
 function Metric({ icon, label, value }) {
   return (
-    <div className="glass-shell rounded-[30px] border-white/10 px-5 py-5 text-white">
+    <div className="glass-shell subtle-hover rounded-[30px] border-white/8 px-5 py-5 text-white">
       <div className="flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#171616] text-[#f7f1e8] shadow-[0_18px_30px_-22px_rgba(23,22,22,0.9)]">
+        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#241f1b] text-[#f7f1e8] shadow-[0_18px_30px_-22px_rgba(43,36,31,0.58)]">
           {createElement(icon, { size: 16 })}
         </div>
         <div>

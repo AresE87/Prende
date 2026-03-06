@@ -25,15 +25,15 @@ export default function SpaceCard({ space, horizontal = false }) {
   if (horizontal) {
     return (
       <Link to={`/espacio/${space.id}`} className="group block">
-        <article className="surface-card grid overflow-hidden rounded-[32px] border border-[#171616]/8 p-3 transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_70px_-42px_rgba(23,22,22,0.42)] sm:grid-cols-[220px_minmax(0,1fr)]">
+        <article className="surface-card surface-card-hover grid overflow-hidden rounded-[32px] border border-[#171616]/8 p-3 sm:grid-cols-[220px_minmax(0,1fr)]">
           <div className="relative overflow-hidden rounded-[24px]">
             <img
               src={images[0]}
               alt={space.title}
-              className="h-52 w-full object-cover transition duration-500 group-hover:scale-105"
+              className="h-52 w-full object-cover transition duration-500 group-hover:scale-[1.04] group-hover:brightness-[1.03]"
               loading="lazy"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#171616]/55 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#231d19]/46 via-transparent to-transparent transition duration-300 group-hover:from-[#231d19]/38" />
             <div className="absolute left-4 top-4 flex flex-wrap gap-2">
               {isSuperhost && <Badge variant="brasa">Superhost</Badge>}
               <Badge variant="default">{capacity} pax</Badge>
@@ -47,7 +47,7 @@ export default function SpaceCard({ space, horizontal = false }) {
                   <MapPin size={12} />
                   {zone}
                 </p>
-                <span className="rounded-full border border-[#171616]/10 bg-white/75 p-2 text-[#171616]/60 transition group-hover:text-[#d5632a]">
+                <span className="subtle-hover rounded-full border border-[#171616]/10 bg-white/75 p-2 text-[#171616]/55 transition group-hover:border-[#d5632a]/18 group-hover:bg-[#fff4ed] group-hover:text-[#d5632a]">
                   <ArrowUpRight size={15} />
                 </span>
               </div>
@@ -59,7 +59,7 @@ export default function SpaceCard({ space, horizontal = false }) {
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {topAmenities.map((amenity) => (
-                  <span key={amenity.id} className="rounded-full border border-[#171616]/10 bg-white/75 px-3 py-1.5 text-xs text-[#171616]/62">
+                  <span key={amenity.id} className="subtle-hover rounded-full border border-[#171616]/10 bg-white/75 px-3 py-1.5 text-xs text-[#171616]/62 group-hover:border-[#171616]/14 group-hover:bg-white/92">
                     {amenity.icon} {amenity.label}
                   </span>
                 ))}
@@ -82,21 +82,21 @@ export default function SpaceCard({ space, horizontal = false }) {
 
   return (
     <Link to={`/espacio/${space.id}`} className="group block h-full">
-      <article className="surface-card flex h-full flex-col overflow-hidden rounded-[32px] border border-[#171616]/8 transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_70px_-42px_rgba(23,22,22,0.42)]">
+      <article className="surface-card surface-card-hover flex h-full flex-col overflow-hidden rounded-[32px] border border-[#171616]/8">
         <div className="relative overflow-hidden">
           <img
             src={images[0]}
             alt={space.title}
-            className="h-64 w-full object-cover transition duration-500 group-hover:scale-105"
+            className="h-64 w-full object-cover transition duration-500 group-hover:scale-[1.04] group-hover:brightness-[1.03]"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#171616]/65 via-[#171616]/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#231d19]/56 via-[#231d19]/8 to-transparent transition duration-300 group-hover:from-[#231d19]/46" />
           <div className="absolute left-4 right-4 top-4 flex items-start justify-between gap-3">
             <div className="flex flex-wrap gap-2">
               {isSuperhost && <Badge variant="brasa">Superhost</Badge>}
               <Badge variant="default">{zone}</Badge>
             </div>
-            <div className="rounded-full border border-white/15 bg-[#171616]/55 px-3 py-1.5 text-white backdrop-blur-md">
+            <div className="subtle-hover rounded-full border border-white/14 bg-[#231d19]/42 px-3 py-1.5 text-white backdrop-blur-md group-hover:bg-[#231d19]/34">
               <Stars rating={rating} size={12} showNumber />
             </div>
           </div>
@@ -105,7 +105,7 @@ export default function SpaceCard({ space, horizontal = false }) {
               <p className="text-[11px] uppercase tracking-[0.18em] text-white/68">Capacidad</p>
               <p className="mt-1 text-sm font-medium">Hasta {capacity} personas</p>
             </div>
-            <span className="rounded-full border border-white/15 bg-white/10 p-2 backdrop-blur-md transition group-hover:bg-[#d5632a]">
+            <span className="subtle-hover rounded-full border border-white/14 bg-white/10 p-2 backdrop-blur-md transition group-hover:bg-[#d5632a]/88 group-hover:text-white">
               <ArrowUpRight size={16} />
             </span>
           </div>
@@ -115,7 +115,7 @@ export default function SpaceCard({ space, horizontal = false }) {
           <h3 className="text-2xl font-semibold leading-tight text-[#171616]">{space.title}</h3>
           <div className="mt-3 flex flex-wrap gap-2">
             {topAmenities.map((amenity) => (
-              <span key={amenity.id} className="rounded-full border border-[#171616]/10 bg-white/75 px-3 py-1.5 text-xs text-[#171616]/62">
+              <span key={amenity.id} className="subtle-hover rounded-full border border-[#171616]/10 bg-white/75 px-3 py-1.5 text-xs text-[#171616]/62 group-hover:border-[#171616]/14 group-hover:bg-white/92">
                 {amenity.icon} {amenity.label}
               </span>
             ))}

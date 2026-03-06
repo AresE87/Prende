@@ -25,8 +25,8 @@ export default function FinalCTA() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="reserva" className="bg-[#171616] px-4 py-24 sm:px-6 sm:py-32">
-      <div className="cta-content section-shell mx-auto max-w-5xl rounded-[44px] border-white/6 bg-[linear-gradient(135deg,#171616_0%,#261f1b_50%,#171616_100%)] px-6 py-10 text-center text-white sm:px-10 sm:py-14">
+    <section ref={sectionRef} id="reserva" className="bg-[#1f1a17] px-4 py-24 sm:px-6 sm:py-32">
+      <div className="cta-content section-shell mx-auto max-w-5xl rounded-[44px] border-white/6 bg-[linear-gradient(135deg,#211c18_0%,#302721_50%,#201b18_100%)] px-6 py-10 text-center text-white sm:px-10 sm:py-14">
         <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-white/10 shadow-[0_24px_44px_-30px_rgba(0,0,0,0.7)]">
           <Flame className="h-8 w-8 text-[#d5632a]" />
         </div>
@@ -40,11 +40,11 @@ export default function FinalCTA() {
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link to="/buscar" className="inline-flex items-center gap-2 rounded-full bg-[#d5632a] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_22px_40px_-24px_rgba(213,99,42,0.82)] transition hover:-translate-y-0.5 hover:bg-[#c75424]">
+          <Link to="/buscar" className="subtle-hover inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#dc7c4d_0%,#c95f31_100%)] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_22px_40px_-24px_rgba(213,99,42,0.56)] transition hover:bg-[linear-gradient(135deg,#e08a5d_0%,#cd6b41_100%)]">
             Explorar espacios
             <ArrowRight size={15} />
           </Link>
-          <Link to="/login?mode=register" className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-6 py-3.5 text-sm font-medium text-white backdrop-blur-md transition hover:bg-white/16">
+          <Link to="/login?mode=register" className="subtle-hover inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-6 py-3.5 text-sm font-medium text-white backdrop-blur-md transition hover:bg-white/16">
             Publicar mi espacio
           </Link>
         </div>
@@ -61,7 +61,7 @@ export default function FinalCTA() {
 
 function Stat({ text, icon = false }) {
   return (
-    <div className="rounded-[26px] border border-white/10 bg-white/8 px-4 py-4 text-sm text-white/76 backdrop-blur-md">
+    <div className="subtle-hover rounded-[26px] border border-white/10 bg-white/8 px-4 py-4 text-sm text-white/76 backdrop-blur-md">
       <div className="flex items-center justify-center gap-2">
         {icon && <ShieldCheck size={15} className="text-[#d5632a]" />}
         <span>{text}</span>
