@@ -1,11 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { AppProvider, useApp } from "./context/AppContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import LoadingScreen from "./components/shared/LoadingScreen";
 import ProtectedRoute from "./components/shared/ProtectedRoute";
+import { lazyWithRetry } from "./lib/lazyWithRetry";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -23,30 +24,30 @@ import FinalCTA from "./components/FinalCTA";
 import Footer from "./components/Footer";
 
 // Dashboard (lazy)
-const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Dashboard = lazyWithRetry(() => import("./pages/Dashboard"));
 
 // Guest flows (lazy)
-const SearchResults = lazy(() => import("./pages/SearchResults"));
-const SpaceDetail = lazy(() => import("./pages/SpaceDetail"));
-const Checkout = lazy(() => import("./pages/Checkout"));
-const BookingConfirmation = lazy(() => import("./pages/BookingConfirmation"));
-const MyBookings = lazy(() => import("./pages/MyBookings"));
-const ReviewFlow = lazy(() => import("./pages/ReviewFlow"));
+const SearchResults = lazyWithRetry(() => import("./pages/SearchResults"));
+const SpaceDetail = lazyWithRetry(() => import("./pages/SpaceDetail"));
+const Checkout = lazyWithRetry(() => import("./pages/Checkout"));
+const BookingConfirmation = lazyWithRetry(() => import("./pages/BookingConfirmation"));
+const MyBookings = lazyWithRetry(() => import("./pages/MyBookings"));
+const ReviewFlow = lazyWithRetry(() => import("./pages/ReviewFlow"));
 
 // Host flows (lazy)
-const HostOnboarding = lazy(() => import("./pages/host/HostOnboarding"));
-const HostDashboard = lazy(() => import("./pages/host/HostDashboard"));
-const CalendarManagement = lazy(() => import("./pages/host/CalendarManagement"));
-const BookingManagement = lazy(() => import("./pages/host/BookingManagement"));
-const Earnings = lazy(() => import("./pages/host/Earnings"));
+const HostOnboarding = lazyWithRetry(() => import("./pages/host/HostOnboarding"));
+const HostDashboard = lazyWithRetry(() => import("./pages/host/HostDashboard"));
+const CalendarManagement = lazyWithRetry(() => import("./pages/host/CalendarManagement"));
+const BookingManagement = lazyWithRetry(() => import("./pages/host/BookingManagement"));
+const Earnings = lazyWithRetry(() => import("./pages/host/Earnings"));
 
 // Auth (lazy)
-const Login = lazy(() => import("./pages/auth/Login"));
-const AuthCallback = lazy(() => import("./pages/auth/AuthCallback"));
-const Profile = lazy(() => import("./pages/auth/Profile"));
+const Login = lazyWithRetry(() => import("./pages/auth/Login"));
+const AuthCallback = lazyWithRetry(() => import("./pages/auth/AuthCallback"));
+const Profile = lazyWithRetry(() => import("./pages/auth/Profile"));
 
 // App Navbar (lazy, fuera del componente para evitar re-imports)
-const AppNavbar = lazy(() => import("./components/shared/Navbar"));
+const AppNavbar = lazyWithRetry(() => import("./components/shared/Navbar"));
 
 const queryClient = new QueryClient({
   defaultOptions: {

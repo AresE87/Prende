@@ -1,10 +1,13 @@
 import { createContext, useContext, useReducer, useEffect, useState } from "react";
 import { supabase, supabaseConfigured, getProfile } from "../lib/supabase";
+import { withTimeout } from "../lib/async";
 
 const AppContext = createContext(null);
+const AUTH_BOOTSTRAP_TIMEOUT_MS = 5000;
+const PROFILE_LOOKUP_TIMEOUT_MS = 3500;
 
 const initialState = {
-  user: null, // { id, name, email, avatar, isHost }
+  user: null,
   searchParams: {
     zona: "",
     fecha: "",
@@ -34,34 +37,62 @@ export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [authLoading, setAuthLoading] = useState(supabaseConfigured);
 
-  // Escuchar cambios de sesión de Supabase
   useEffect(() => {
     if (!supabaseConfigured) {
-      return;
+      return undefined;
     }
 
-    // Obtener sesión inicial
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        await loadUserProfile(session.user, dispatch);
-      }
-      setAuthLoading(false);
-    }).catch(() => {
-      setAuthLoading(false);
-    });
+    let active = true;
 
-    // Listener para cambios de auth (login, logout, token refresh)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === "SIGNED_IN" && session?.user) {
+    async function bootstrapAuth() {
+      try {
+        const { data: { session } } = await withTimeout(
+          supabase.auth.getSession(),
+          AUTH_BOOTSTRAP_TIMEOUT_MS,
+          "La sesion tardo demasiado en responder.",
+        );
+
+        if (!active) return;
+
+        if (session?.user) {
           await loadUserProfile(session.user, dispatch);
-        } else if (event === "SIGNED_OUT") {
+        } else {
           dispatch({ type: "LOGOUT" });
         }
+      } catch {
+        if (!active) return;
+        dispatch({ type: "LOGOUT" });
+      } finally {
+        if (active) {
+          setAuthLoading(false);
+        }
       }
-    );
+    }
 
-    return () => subscription.unsubscribe();
+    void bootstrapAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      window.setTimeout(() => {
+        if (!active) return;
+
+        if (event === "SIGNED_OUT") {
+          dispatch({ type: "LOGOUT" });
+          return;
+        }
+
+        if (
+          session?.user &&
+          ["INITIAL_SESSION", "SIGNED_IN", "TOKEN_REFRESHED", "USER_UPDATED"].includes(event)
+        ) {
+          void loadUserProfile(session.user, dispatch);
+        }
+      }, 0);
+    });
+
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
@@ -78,10 +109,14 @@ export function useApp() {
   return ctx;
 }
 
-// Helper: cargar perfil de Supabase y setear en estado
 async function loadUserProfile(authUser, dispatch) {
   try {
-    const profile = await getProfile(authUser.id);
+    const profile = await withTimeout(
+      getProfile(authUser.id),
+      PROFILE_LOOKUP_TIMEOUT_MS,
+      "El perfil tardo demasiado en responder.",
+    );
+
     dispatch({
       type: "SET_USER",
       payload: {
@@ -94,7 +129,6 @@ async function loadUserProfile(authUser, dispatch) {
       },
     });
   } catch {
-    // Si falla el perfil (tabla no existe aún, etc), usar datos del auth
     dispatch({
       type: "SET_USER",
       payload: {

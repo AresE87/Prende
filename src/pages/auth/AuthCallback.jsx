@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { getProfile, supabase, supabaseConfigured } from "../../lib/supabase";
 import { getSignedInHome } from "../../lib/navigation";
 import LoadingScreen from "../../components/shared/LoadingScreen";
+import { withTimeout } from "../../lib/async";
+
+const CALLBACK_SESSION_TIMEOUT_MS = 5000;
+const CALLBACK_PROFILE_TIMEOUT_MS = 3500;
 
 export default function AuthCallback() {
   const navigate = useNavigate();
@@ -17,7 +21,11 @@ export default function AuthCallback() {
 
     const timeout = setTimeout(async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await withTimeout(
+          supabase.auth.getSession(),
+          CALLBACK_SESSION_TIMEOUT_MS,
+          "La sesion de acceso tardo demasiado en responder.",
+        );
 
         if (!active) return;
 
@@ -27,7 +35,11 @@ export default function AuthCallback() {
         }
 
         try {
-          const profile = await getProfile(session.user.id);
+          const profile = await withTimeout(
+            getProfile(session.user.id),
+            CALLBACK_PROFILE_TIMEOUT_MS,
+            "El perfil tardo demasiado en responder.",
+          );
 
           if (!active) return;
 
