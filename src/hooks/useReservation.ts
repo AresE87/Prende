@@ -1,11 +1,11 @@
 // src/hooks/useReservation.ts
 // Hook que maneja el flujo completo de una reserva:
-// selección de horario → creación de preferencia → polling de estado
+// selecciÃƒÂ³n de horario Ã¢â€ â€™ creaciÃƒÂ³n de preferencia Ã¢â€ â€™ polling de estado
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { supabase, subscribeToBookingStatus, type Booking } from "../lib/supabase";
 
-// ─── TIPOS ───────────────────────────────────────────────────
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ TIPOS Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 export interface ReservationForm {
   spaceId:         string;
@@ -33,12 +33,12 @@ export interface ReservationState {
   mpInitPoint:     string | null;
   error:           string | null;
   totalHours:      number;
-  totalCharged:    number;    // UYU — lo que paga el guest
-  hostPayout:      number;    // UYU — lo que recibe el host
-  platformFee:     number;    // UYU — comisión de Prende
+  totalCharged:    number;    // UYU Ã¢â‚¬â€ lo que paga el guest
+  hostPayout:      number;    // UYU Ã¢â‚¬â€ lo que recibe el host
+  platformFee:     number;    // UYU Ã¢â‚¬â€ comisiÃƒÂ³n de Prende
 }
 
-// ─── HOOK ────────────────────────────────────────────────────
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ HOOK Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 export function useReservation() {
   const [state, setState] = useState<ReservationState>({
@@ -55,7 +55,7 @@ export function useReservation() {
 
   const subscriptionRef = useRef<ReturnType<typeof subscribeToBookingStatus> | null>(null);
 
-  // Limpiar suscripción al desmontar
+  // Limpiar suscripciÃƒÂ³n al desmontar
   useEffect(() => {
     return () => {
       subscriptionRef.current?.unsubscribe();
@@ -64,7 +64,7 @@ export function useReservation() {
 
   /**
    * Calcula el precio estimado antes de iniciar el pago.
-   * Útil para mostrar el resumen en el UI antes de confirmar.
+   * ÃƒÅ¡til para mostrar el resumen en el UI antes de confirmar.
    */
   const calculatePrice = useCallback((
     pricePerHour: number,
@@ -89,7 +89,7 @@ export function useReservation() {
 
   /**
    * Inicia el flujo de reserva:
-   * 1. Valida que el usuario está autenticado
+   * 1. Valida que el usuario estÃƒÂ¡ autenticado
    * 2. Crea la preferencia de pago en MercadoPago
    * 3. Redirige al usuario a MP o abre el checkout
    */
@@ -97,10 +97,10 @@ export function useReservation() {
     setState(prev => ({ ...prev, step: "validating", error: null }));
 
     try {
-      // Verificar autenticación
+      // Verificar autenticaciÃƒÂ³n
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        setState(prev => ({ ...prev, step: "error", error: "Debés iniciar sesión para hacer una reserva" }));
+        setState(prev => ({ ...prev, step: "error", error: "DebÃƒÂ©s iniciar sesiÃƒÂ³n para hacer una reserva" }));
         return;
       }
 
@@ -117,8 +117,10 @@ export function useReservation() {
 
       const { preferenceId, initPoint, sandboxInitPoint } = data;
 
-      // Determinar si usamos sandbox o producción
-      const mpUrl = import.meta.env.DEV ? sandboxInitPoint : initPoint;
+      // Determinar si usamos sandbox o producciÃƒÂ³n
+      const mpUrl = import.meta.env.DEV
+        ? (sandboxInitPoint ?? initPoint)
+        : initPoint;
 
       setState(prev => ({
         ...prev,
@@ -155,7 +157,7 @@ export function useReservation() {
 
   /**
    * Verifica el estado de una reserva por preferenceId.
-   * Llamar desde la página de retorno de MP (back_url).
+   * Llamar desde la pÃƒÂ¡gina de retorno de MP (back_url).
    */
   const checkPaymentStatus = useCallback(async (preferenceId: string) => {
     setState(prev => ({ ...prev, step: "waiting_payment", preferenceId }));
@@ -168,7 +170,7 @@ export function useReservation() {
         .maybeSingle();
 
       if (!booking) {
-        // Aún no procesado — esperar con polling
+        // AÃƒÂºn no procesado Ã¢â‚¬â€ esperar con polling
         startPolling(preferenceId);
         return;
       }
@@ -195,7 +197,7 @@ export function useReservation() {
 
   /**
    * Polling como fallback si el realtime no funciona.
-   * Reintentos cada 3 segundos, máximo 20 veces (1 minuto).
+   * Reintentos cada 3 segundos, mÃƒÂ¡ximo 20 veces (1 minuto).
    */
   const startPolling = useCallback((preferenceId: string) => {
     let attempts = 0;
@@ -207,7 +209,7 @@ export function useReservation() {
         setState(prev => ({
           ...prev,
           step:  "error",
-          error: "El pago tardó demasiado en confirmarse. Si ya pagaste, contactanos.",
+          error: "El pago tardÃƒÂ³ demasiado en confirmarse. Si ya pagaste, contactanos.",
         }));
         return;
       }
@@ -237,7 +239,7 @@ export function useReservation() {
       }
     };
 
-    setTimeout(poll, 2000); // Primera verificación a los 2 segundos
+    setTimeout(poll, 2000); // Primera verificaciÃƒÂ³n a los 2 segundos
   }, []);
 
   /**
@@ -245,34 +247,14 @@ export function useReservation() {
    */
   const cancelBooking = useCallback(async (bookingId: string) => {
     try {
-      const { data: booking } = await supabase
-        .from("bookings")
-        .select("cancellation_deadline, status")
-        .eq("id", bookingId)
-        .single();
+      const { data, error } = await supabase.functions.invoke("mp-release-payment", {
+        body: { bookingId, action: "cancel" },
+      });
 
-      if (!booking) throw new Error("Reserva no encontrada");
-      if (!["paid", "confirmed"].includes(booking.status)) {
-        throw new Error("Esta reserva no puede ser cancelada");
-      }
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
-      const canRefund = new Date() < new Date(booking.cancellation_deadline);
-
-      if (canRefund) {
-        // Solicitar reembolso via Edge Function
-        const { error } = await supabase.functions.invoke("mp-release-payment", {
-          body: { bookingId, action: "refund" },
-        });
-        if (error) throw error;
-      } else {
-        // Sin reembolso — solo cancelar
-        await supabase
-          .from("bookings")
-          .update({ status: "cancelled" })
-          .eq("id", bookingId);
-      }
-
-      return { refunded: canRefund };
+      return { refunded: Boolean(data?.refunded) };
 
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : "Error cancelando reserva");

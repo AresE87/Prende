@@ -1,144 +1,208 @@
-// ─── BOOKING MANAGEMENT ──────────────────────────────────────────────────────
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { MessageCircle, Check, X, Filter } from "lucide-react";
-import { Button, Card, StatusBadge, Badge, PageContainer, SectionTitle, Modal, Avatar } from "../../components/shared";
+import { useEffect, useMemo, useState } from "react";
+import { MessageCircle } from "lucide-react";
+import { Button, Card, StatusBadge, Badge, PageContainer, SectionTitle, Skeleton, EmptyState } from "../../components/shared";
 import { formatUYU, formatDate } from "../../lib/utils";
+import { getMyBookings } from "../../lib/supabase";
 
-const ALL_BOOKINGS = [
-  { id: "b1", guest: "Camila R.", avatar: "https://i.pravatar.cc/40?img=21", date: "2025-03-15T14:00:00", endTime: "20:00", persons: 12, total: 7200, status: "confirmada", message: "Hola! Quiero reservar para un cumpleaños con familia." },
-  { id: "b2", guest: "Rodrigo M.", avatar: "https://i.pravatar.cc/40?img=31", date: "2025-03-18T12:00:00", endTime: "18:00", persons: 8, total: 4800, status: "pendiente", message: "Somos 8 amigos para un asado clásico de domingo." },
-  { id: "b3", guest: "Laura P.", avatar: "https://i.pravatar.cc/40?img=52", date: "2025-03-22T16:00:00", endTime: "22:00", persons: 15, total: 8400, status: "confirmada", message: "" },
-  { id: "b4", guest: "Mateo S.", avatar: "https://i.pravatar.cc/40?img=15", date: "2025-02-28T14:00:00", endTime: "20:00", persons: 10, total: 7200, status: "completada", message: "" },
-  { id: "b5", guest: "Sofía A.", avatar: "https://i.pravatar.cc/40?img=44", date: "2025-02-20T18:00:00", endTime: "22:00", persons: 6, total: 4800, status: "cancelada", message: "" },
+const FILTERS = [
+  { id: "all", label: "Todas" },
+  { id: "pending", label: "Pendientes" },
+  { id: "paid", label: "Pagadas" },
+  { id: "confirmed", label: "Confirmadas" },
+  { id: "completed", label: "Completadas" },
+  { id: "cancelled", label: "Canceladas" },
 ];
+
+const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400";
 
 export function BookingManagement() {
   const [filter, setFilter] = useState("all");
-  const [selected, setSelected] = useState(null);
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const filters = [
-    { id: "all",       label: "Todas" },
-    { id: "pendiente", label: "Pendientes" },
-    { id: "confirmada",label: "Confirmadas" },
-    { id: "completada",label: "Completadas" },
-  ];
+  useEffect(() => {
+    let cancelled = false;
 
-  const filtered = filter === "all" ? ALL_BOOKINGS : ALL_BOOKINGS.filter((b) => b.status === filter);
+    async function loadHostBookings() {
+      setLoading(true);
+      setError("");
+
+      try {
+        const data = await getMyBookings("host");
+        if (!cancelled) setBookings(data);
+      } catch (err) {
+        console.error("Error cargando reservas host:", err);
+        if (!cancelled) setError("No pudimos cargar tus reservas.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadHostBookings();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const filtered = filter === "all"
+    ? bookings
+    : bookings.filter((booking) => booking.status === filter);
+
+  const pendingCount = bookings.filter((booking) => booking.status === "pending").length;
 
   return (
     <PageContainer>
       <SectionTitle sub="Administrá las reservas de tu espacio">Reservas</SectionTitle>
 
-      {/* Filter tabs */}
+      {error && (
+        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
       <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
-        {filters.map((f) => (
+        {FILTERS.map((item) => (
           <button
-            key={f.id}
-            onClick={() => setFilter(f.id)}
-            className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all font-['Inter'] ${filter === f.id ? "bg-[#1C1917] text-white" : "bg-white border border-[#1C1917]/15 text-[#1C1917] hover:border-[#1C1917]/40"}`}
+            key={item.id}
+            onClick={() => setFilter(item.id)}
+            className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all font-['Inter'] ${filter === item.id ? "bg-[#1C1917] text-white" : "bg-white border border-[#1C1917]/15 text-[#1C1917] hover:border-[#1C1917]/40"}`}
           >
-            {f.label}
-            {f.id === "pendiente" && ALL_BOOKINGS.filter((b) => b.status === "pendiente").length > 0 && (
+            {item.label}
+            {item.id === "pending" && pendingCount > 0 && (
               <span className="ml-1.5 bg-[#D4541B] text-white text-xs w-4 h-4 rounded-full inline-flex items-center justify-center">
-                {ALL_BOOKINGS.filter((b) => b.status === "pendiente").length}
+                {pendingCount}
               </span>
             )}
           </button>
         ))}
       </div>
 
-      <div className="space-y-3">
-        {filtered.map((b) => (
-          <Card key={b.id} className="p-4">
-            <div className="flex items-start gap-3">
-              <Avatar src={b.avatar} name={b.guest} size="md" />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2 mb-1">
-                  <span className="font-bold text-[#1C1917] text-sm font-['Inter']">{b.guest}</span>
-                  <StatusBadge status={b.status} />
-                </div>
-                <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-[#1C1917]/50 font-['Inter'] mb-2">
-                  <span>📅 {formatDate(b.date)}</span>
-                  <span>🕐 {new Date(b.date).getHours()}:00 → {b.endTime}</span>
-                  <span>👥 {b.persons} pers.</span>
-                  <span className="font-['JetBrains_Mono'] font-bold text-[#D4541B]">{formatUYU(b.total)}</span>
-                </div>
-                {b.message && (
-                  <p className="text-xs text-[#1C1917]/60 bg-[#FAF7F2] rounded-lg px-3 py-2 font-['Inter'] italic mb-2">
-                    "{b.message}"
-                  </p>
-                )}
-                <div className="flex gap-2 flex-wrap">
-                  {b.status === "pendiente" && (
-                    <>
-                      <Button size="sm" variant="success" onClick={() => setSelected({ ...b, action: "accept" })}>
-                        <Check size={14} /> Aceptar
-                      </Button>
-                      <Button size="sm" variant="danger" onClick={() => setSelected({ ...b, action: "reject" })}>
-                        <X size={14} /> Rechazar
-                      </Button>
-                    </>
-                  )}
-                  <Button size="sm" variant="ghost">
-                    <MessageCircle size={14} /> Contactar
-                  </Button>
+      {loading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, idx) => (
+            <Card key={idx} className="p-4">
+              <div className="flex gap-4">
+                <Skeleton className="w-16 h-16 rounded-xl" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-1/3" />
+                  <Skeleton className="h-3 w-2/3" />
+                  <Skeleton className="h-3 w-1/2" />
                 </div>
               </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      {/* Confirm action modal */}
-      <Modal
-        open={!!selected}
-        onClose={() => setSelected(null)}
-        title={selected?.action === "accept" ? "Confirmar reserva" : "Rechazar reserva"}
-      >
-        {selected && (
-          <div>
-            <p className="text-[#1C1917]/70 font-['Inter'] mb-4">
-              {selected.action === "accept"
-                ? `¿Confirmás la reserva de ${selected.guest} para el ${formatDate(selected.date)}?`
-                : `¿Rechazás la solicitud de ${selected.guest}? El usuario será notificado.`}
-            </p>
-            <div className="flex gap-3">
-              <Button variant="outline" fullWidth onClick={() => setSelected(null)}>Cancelar</Button>
-              <Button
-                fullWidth
-                variant={selected.action === "accept" ? "success" : "danger"}
-                onClick={() => { console.log(`${selected.action} booking ${selected.id}`); setSelected(null); }}
-              >
-                {selected.action === "accept" ? "Confirmar" : "Rechazar"}
-              </Button>
-            </div>
-          </div>
-        )}
-      </Modal>
+            </Card>
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <EmptyState
+          icon="??"
+          title="No hay reservas para este filtro"
+          description="Cuando entren nuevas reservas aparecerán acá."
+        />
+      ) : (
+        <div className="space-y-3">
+          {filtered.map((booking) => (
+            <Card key={booking.id} className="p-4">
+              <div className="flex items-start gap-3">
+                <img
+                  src={Array.isArray(booking?.space?.photos) && booking.space.photos.length > 0 ? booking.space.photos[0] : PLACEHOLDER_IMAGE}
+                  alt={booking?.space?.title ?? "Espacio"}
+                  className="w-16 h-16 object-cover rounded-xl"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="font-bold text-[#1C1917] text-sm font-['Inter'] line-clamp-1">{booking?.space?.title ?? "Espacio"}</span>
+                    <StatusBadge status={booking.status} />
+                  </div>
+                  <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-[#1C1917]/50 font-['Inter'] mb-2">
+                    <span>?? {formatDate(`${booking.date}T12:00:00`)}</span>
+                    <span>?? {String(booking.start_time).slice(0, 5)} ? {String(booking.end_time).slice(0, 5)}</span>
+                    <span>?? {booking.guest_count} pers.</span>
+                    <span className="font-['JetBrains_Mono'] font-bold text-[#D4541B]">{formatUYU(booking.total_charged)}</span>
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    <Button size="sm" variant="ghost" onClick={() => window.alert("Integrar chat/WhatsApp del guest en siguiente paso") }>
+                      <MessageCircle size={14} /> Contactar
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </PageContainer>
   );
 }
 
-// ─── EARNINGS ────────────────────────────────────────────────────────────────
-const EARNINGS_DATA = [
-  { month: "Enero 2025",    reservas: 9,  gmv: 32400, neto: 27540, status: "liquidado" },
-  { month: "Febrero 2025",  reservas: 11, gmv: 39600, neto: 33660, status: "liquidado" },
-  { month: "Marzo 2025",    reservas: 8,  gmv: 28800, neto: 24480, status: "pendiente" },
-];
+const MONTHS = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
 export function Earnings() {
-  const total = EARNINGS_DATA.reduce((s, d) => s + d.neto, 0);
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadHostBookings() {
+      setLoading(true);
+      try {
+        const data = await getMyBookings("host");
+        if (!cancelled) setBookings(data);
+      } catch {
+        if (!cancelled) setBookings([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadHostBookings();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const monthlyRows = useMemo(() => {
+    const grouped = new Map();
+
+    bookings.forEach((booking) => {
+      const date = new Date(`${booking.date}T12:00:00`);
+      const key = `${date.getFullYear()}-${date.getMonth()}`;
+      if (!grouped.has(key)) {
+        grouped.set(key, {
+          key,
+          month: `${MONTHS[date.getMonth()]} ${date.getFullYear()}`,
+          reservas: 0,
+          gmv: 0,
+          neto: 0,
+          released: true,
+        });
+      }
+
+      const row = grouped.get(key);
+      row.reservas += 1;
+      row.gmv += Number(booking.total_charged ?? 0);
+      row.neto += Number(booking.host_payout ?? 0);
+      if (booking.payment_status !== "released") row.released = false;
+    });
+
+    return Array.from(grouped.values())
+      .sort((a, b) => (a.key < b.key ? 1 : -1));
+  }, [bookings]);
+
+  const total = monthlyRows.reduce((sum, row) => sum + row.neto, 0);
+  const nextPending = monthlyRows.find((row) => !row.released);
 
   return (
     <PageContainer>
       <SectionTitle sub="Historial de pagos y próximas liquidaciones">Ganancias</SectionTitle>
 
-      {/* Summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         {[
-          { label: "Ganancias acumuladas", value: formatUYU(total), sub: "Neto después de comisión Prende" },
-          { label: "Próxima liquidación", value: formatUYU(24480), sub: "Marzo 2025 · ~15 días" },
+          { label: "Ganancias acumuladas", value: formatUYU(total), sub: "Neto histórico (host_payout)" },
+          { label: "Próxima liquidación", value: nextPending ? formatUYU(nextPending.neto) : formatUYU(0), sub: nextPending ? `${nextPending.month}` : "Sin pendientes" },
           { label: "Take rate Prende", value: "15%", sub: "Sobre cada transacción" },
         ].map(({ label, value, sub }) => (
           <Card key={label} className="p-5">
@@ -149,41 +213,46 @@ export function Earnings() {
         ))}
       </div>
 
-      {/* Table */}
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="bg-[#FAF7F2] border-b border-[#1C1917]/10">
-                {["Período", "Reservas", "GMV total", "Tu ganancia (85%)", "Estado"].map((h) => (
-                  <th key={h} className="px-5 py-3 text-left text-xs font-bold text-[#1C1917]/40 uppercase tracking-wider font-['Inter']">
-                    {h}
+                {["Período", "Reservas", "GMV total", "Tu ganancia (host_payout)", "Estado"].map((header) => (
+                  <th key={header} className="px-5 py-3 text-left text-xs font-bold text-[#1C1917]/40 uppercase tracking-wider font-['Inter']">
+                    {header}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {EARNINGS_DATA.map((row, i) => (
-                <tr key={i} className="border-b border-[#1C1917]/8 last:border-0 hover:bg-[#FAF7F2]/50 transition-colors">
-                  <td className="px-5 py-4 text-sm font-medium text-[#1C1917] font-['Inter']">{row.month}</td>
-                  <td className="px-5 py-4 text-sm text-[#1C1917]/60 font-['JetBrains_Mono']">{row.reservas}</td>
-                  <td className="px-5 py-4 text-sm text-[#1C1917]/60 font-['JetBrains_Mono']">{formatUYU(row.gmv)}</td>
-                  <td className="px-5 py-4 text-sm font-bold text-[#D4541B] font-['JetBrains_Mono']">{formatUYU(row.neto)}</td>
-                  <td className="px-5 py-4">
-                    <Badge variant={row.status === "liquidado" ? "success" : "warning"}>
-                      {row.status === "liquidado" ? "✓ Liquidado" : "⏳ Pendiente"}
-                    </Badge>
-                  </td>
+              {loading ? (
+                <tr>
+                  <td colSpan={5} className="px-5 py-6 text-sm text-[#1C1917]/50">Cargando...</td>
                 </tr>
-              ))}
+              ) : monthlyRows.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-5 py-6 text-sm text-[#1C1917]/50">Aún no hay movimientos.</td>
+                </tr>
+              ) : (
+                monthlyRows.map((row) => (
+                  <tr key={row.key} className="border-b border-[#1C1917]/8 last:border-0 hover:bg-[#FAF7F2]/50 transition-colors">
+                    <td className="px-5 py-4 text-sm font-medium text-[#1C1917] font-['Inter']">{row.month}</td>
+                    <td className="px-5 py-4 text-sm text-[#1C1917]/60 font-['JetBrains_Mono']">{row.reservas}</td>
+                    <td className="px-5 py-4 text-sm text-[#1C1917]/60 font-['JetBrains_Mono']">{formatUYU(row.gmv)}</td>
+                    <td className="px-5 py-4 text-sm font-bold text-[#D4541B] font-['JetBrains_Mono']">{formatUYU(row.neto)}</td>
+                    <td className="px-5 py-4">
+                      <Badge variant={row.released ? "success" : "warning"}>
+                        {row.released ? "? Liquidado" : "? Pendiente"}
+                      </Badge>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </Card>
-
-      <p className="text-xs text-[#1C1917]/40 mt-4 font-['Inter']">
-        Las liquidaciones se realizan los días 15 de cada mes. El dinero se acredita en tu cuenta bancaria en 1–2 días hábiles.
-      </p>
     </PageContainer>
   );
 }

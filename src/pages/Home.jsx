@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Calendar, Users, Search, ArrowRight } from "lucide-react";
 import { useApp } from "../context/AppContext";
-import { Button, Select } from "../components/shared";
+import { Button, Skeleton } from "../components/shared";
 import SpaceCard from "../components/booking/SpaceCard";
-import { ZONAS, MOCK_SPACES } from "../lib/utils";
+import { supabase, supabaseConfigured } from "../lib/supabase";
+import { ZONAS } from "../lib/utils";
 
 const HIGHLIGHTS = [
   { icon: "🔥", label: "Con parrilla de leña" },
@@ -20,6 +21,59 @@ export default function Home() {
   const [zona, setZona] = useState("");
   const [fecha, setFecha] = useState("");
   const [personas, setPersonas] = useState(4);
+  const [featuredSpaces, setFeaturedSpaces] = useState([]);
+  const [loadingFeatured, setLoadingFeatured] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadFeatured() {
+      setLoadingFeatured(true);
+      try {
+        if (!supabaseConfigured) throw new Error("Supabase no configurado");
+
+        const { data, error } = await supabase
+          .from("spaces")
+          .select("id, title, neighborhood, city, price_per_hour, max_guests, rating_avg, rating_count, photos, amenities")
+          .eq("status", "active")
+          .order("rating_avg", { ascending: false })
+          .order("rating_count", { ascending: false })
+          .limit(8);
+
+        if (error) throw error;
+
+        const mapped = (data ?? []).map((space) => ({
+          id: space.id,
+          title: space.title,
+          zona: space.neighborhood ?? space.city ?? "Montevideo",
+          price: space.price_per_hour,
+          rating: Number(space.rating_avg ?? 0),
+          reviews: Number(space.rating_count ?? 0),
+          capacity: space.max_guests,
+          images: Array.isArray(space.photos) && space.photos.length > 0
+            ? space.photos
+            : ["https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800"],
+          amenities: Array.isArray(space.amenities) ? space.amenities : [],
+          host: {
+            superhost: Number(space.rating_avg ?? 0) >= 4.8 && Number(space.rating_count ?? 0) >= 10,
+          },
+        }));
+
+        if (!cancelled) setFeaturedSpaces(mapped);
+      } catch (err) {
+        console.error("Error cargando destacados:", err);
+        if (!cancelled) setFeaturedSpaces([]);
+      } finally {
+        if (!cancelled) setLoadingFeatured(false);
+      }
+    }
+
+    loadFeatured();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function handleSearch(e) {
     e.preventDefault();
@@ -155,9 +209,22 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {MOCK_SPACES.map((space) => (
-            <SpaceCard key={space.id} space={space} />
-          ))}
+          {loadingFeatured ? (
+            Array.from({ length: 8 }).map((_, idx) => (
+              <div key={idx} className="bg-white rounded-2xl border border-[#1C1917]/8 overflow-hidden">
+                <Skeleton className="h-52 w-full rounded-none" />
+                <div className="p-4 space-y-3">
+                  <Skeleton className="h-4 w-2/3" />
+                  <Skeleton className="h-3 w-1/2" />
+                  <Skeleton className="h-3 w-full" />
+                </div>
+              </div>
+            ))
+          ) : (
+            featuredSpaces.map((space) => (
+              <SpaceCard key={space.id} space={space} />
+            ))
+          )}
         </div>
       </section>
 

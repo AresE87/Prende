@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { createElement, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Menu, X, Flame, ChevronDown, User, CalendarDays, LogOut, LayoutDashboard } from "lucide-react";
 import { useApp } from "../../context/AppContext";
@@ -120,13 +120,13 @@ export default function Navbar() {
   );
 }
 
-function DropItem({ icon: Icon, label, onClick, danger = false }) {
+function DropItem({ icon, label, onClick, danger = false }) {
   return (
     <button
       onClick={onClick}
       className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-[#FAF7F2] transition-colors font-['Inter'] ${danger ? "text-red-600" : "text-[#1C1917]"}`}
     >
-      <Icon size={16} />
+      {createElement(icon, { size: 16 })}
       {label}
     </button>
   );

@@ -51,7 +51,7 @@ export default function Login() {
 
     try {
       if (mode === "register") {
-        const { user, session } = await signUpWithEmail(d.email, d.password, d.name);
+        const { session } = await signUpWithEmail(d.email, d.password, d.name);
 
         if (!session) {
           // Supabase requiere confirmación de email

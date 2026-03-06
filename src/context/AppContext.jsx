@@ -32,12 +32,11 @@ function reducer(state, action) {
 
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [authLoading, setAuthLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(supabaseConfigured);
 
   // Escuchar cambios de sesión de Supabase
   useEffect(() => {
     if (!supabaseConfigured) {
-      setAuthLoading(false);
       return;
     }
 
@@ -72,6 +71,7 @@ export function AppProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useApp() {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error("useApp debe usarse dentro de AppProvider");
@@ -93,7 +93,7 @@ async function loadUserProfile(authUser, dispatch) {
         phone: profile?.phone ?? null,
       },
     });
-  } catch (err) {
+  } catch {
     // Si falla el perfil (tabla no existe aún, etc), usar datos del auth
     dispatch({
       type: "SET_USER",

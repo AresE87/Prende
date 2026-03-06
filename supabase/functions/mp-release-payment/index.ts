@@ -9,7 +9,7 @@ const CORS = {
 
 type ReleaseRequest = {
   bookingId?: string;
-  action?: "release" | "refund";
+  action?: "release" | "refund" | "cancel";
 };
 
 serve(async (req) => {
@@ -27,6 +27,10 @@ serve(async (req) => {
 
     if (action === "refund") {
       return await handleRefundAction(req, supabase, body.bookingId);
+    }
+
+    if (action === "cancel") {
+      return await handleCancelAction(req, supabase, body.bookingId);
     }
 
     return await handleReleaseAction(req, supabase, body.bookingId);
@@ -169,6 +173,85 @@ async function handleRefundAction(
     refunded: true,
     bookingId: booking.id,
     amount: booking.total_charged,
+  });
+}
+
+async function handleCancelAction(
+  req: Request,
+  supabase: ReturnType<typeof createClient>,
+  bookingId?: string,
+): Promise<Response> {
+  if (!bookingId) return json({ error: "bookingId es obligatorio para cancelar" }, 400);
+
+  const user = await getUserFromRequest(req, supabase);
+  if (!user) return json({ error: "No autorizado" }, 401);
+
+  const { data: booking, error: bookingError } = await supabase
+    .from("bookings")
+    .select("id, guest_id, status, payment_status, cancellation_deadline, mp_payment_id, total_charged")
+    .eq("id", bookingId)
+    .maybeSingle();
+
+  if (bookingError || !booking) return json({ error: "Reserva no encontrada" }, 404);
+  if (booking.guest_id !== user.id) return json({ error: "No podes cancelar esta reserva" }, 403);
+
+  if (booking.status === "cancelled" || booking.status === "refunded") {
+    return json({ ok: true, alreadyCancelled: true, refunded: booking.status === "refunded" });
+  }
+
+  if (!["pending", "paid", "confirmed"].includes(booking.status)) {
+    return json({ error: "Esta reserva no puede ser cancelada" }, 400);
+  }
+
+  const deadline = new Date(booking.cancellation_deadline);
+  const canRefund = Boolean(booking.mp_payment_id) && new Date() <= deadline;
+
+  if (canRefund && booking.mp_payment_id) {
+    const refundResponse = await fetch(
+      `https://api.mercadopago.com/v1/payments/${booking.mp_payment_id}/refunds`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${mustEnv("MP_ACCESS_TOKEN")}`,
+          "Content-Type": "application/json",
+          "X-Idempotency-Key": `refund-${booking.id}`,
+        },
+        body: JSON.stringify({ amount: booking.total_charged }),
+      },
+    );
+
+    if (!refundResponse.ok) {
+      const error = await safeJson(refundResponse);
+      console.error("Error reembolsando en MP", error);
+      return json({ error: "No se pudo procesar el reembolso" }, 502);
+    }
+  }
+
+  const nextPaymentStatus = canRefund
+    ? "refunded"
+    : booking.status === "pending"
+      ? "rejected"
+      : booking.payment_status;
+
+  await supabase
+    .from("bookings")
+    .update({
+      status: "cancelled",
+      payment_status: nextPaymentStatus,
+      payment_error: canRefund ? null : "cancelled_without_refund",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", booking.id);
+
+  if (canRefund) {
+    await triggerNotifications(supabase, booking.id, "payment_refunded");
+  }
+
+  return json({
+    ok: true,
+    bookingId: booking.id,
+    cancelled: true,
+    refunded: canRefund,
   });
 }
 

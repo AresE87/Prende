@@ -4,9 +4,9 @@
 
 import { createClient } from "@supabase/supabase-js";
 
-// ─── TIPOS DE BASE DE DATOS ──────────────────────────────────
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ TIPOS DE BASE DE DATOS Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 // Generados con: supabase gen types typescript --project-id TU_ID > src/lib/database.types.ts
-// Por ahora los definimos manualmente hasta que el schema esté estable
+// Por ahora los definimos manualmente hasta que el schema estÃƒÂ© estable
 
 export type SpaceStatus   = "draft" | "active" | "paused" | "deleted";
 export type BookingStatus = "pending" | "paid" | "confirmed" | "completed" | "cancelled" | "refunded";
@@ -106,7 +106,7 @@ export interface NearbySpace extends Pick<Space,
 
 type UUID = string;
 
-// ─── SUPABASE CLIENT ─────────────────────────────────────────
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ SUPABASE CLIENT Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 const supabaseUrl  = import.meta.env.VITE_SUPABASE_URL  ?? "";
 const supabaseAnon = import.meta.env.VITE_SUPABASE_ANON_KEY ?? "";
@@ -124,7 +124,7 @@ export const supabase = supabaseConfigured
     })
   : (null as unknown as ReturnType<typeof createClient>);
 
-// ─── AUTH HELPERS ────────────────────────────────────────────
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ AUTH HELPERS Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 export async function signUpWithEmail(email: string, password: string, fullName: string) {
   const { data, error } = await supabase.auth.signUp({
@@ -186,10 +186,10 @@ export async function upsertProfile(userId: string, updates: Partial<Profile>) {
   return data;
 }
 
-// ─── HELPERS ─────────────────────────────────────────────────
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ HELPERS Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 /**
- * Busca espacios por radio geográfico usando la función de PostgreSQL.
+ * Busca espacios por radio geogrÃƒÂ¡fico usando la funciÃƒÂ³n de PostgreSQL.
  * Retorna espacios ordenados por distancia.
  */
 export async function searchNearbySpaces(params: {
@@ -225,13 +225,39 @@ export async function searchNearbySpaces(params: {
 export async function getSpaceWithHost(spaceId: string) {
   const { data, error } = await supabase
     .from("spaces")
-    .select("*, host:profiles!host_id(full_name, avatar_url, rating_avg, created_at)")
+    .select("*, host:profiles!host_id(full_name, avatar_url, is_host, created_at)")
     .eq("id", spaceId)
     .eq("status", "active")
     .single();
 
   if (error) throw error;
   return data;
+}
+
+/**
+ * Obtiene reseÃƒÂ±as pÃƒÂºblicas de un espacio (guest -> host/space).
+ */
+export async function getSpaceReviews(spaceId: string, limit = 12) {
+  const { data, error } = await supabase
+    .from("reviews")
+    .select(`
+      id,
+      rating,
+      comment,
+      created_at,
+      reviewer:profiles!reviewer_id ( full_name, avatar_url )
+    `)
+    .eq("space_id", spaceId)
+    .eq("is_host_reviewing", false)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("Error obteniendo reseÃƒÂ±as:", error);
+    return [];
+  }
+
+  return data ?? [];
 }
 
 /**
@@ -245,9 +271,10 @@ export async function getMyBookings(role: "guest" | "host") {
 
   const { data, error } = await supabase
     .from("bookings")
-    .select("*, space:spaces(title, address, photos)")
+    .select("*, space:spaces(id, title, address, neighborhood, photos)")
     .eq(column, user.id)
-    .order("date", { ascending: false });
+    .order("date", { ascending: false })
+    .order("start_time", { ascending: false });
 
   if (error) {
     console.error("Error obteniendo reservas:", error);
@@ -258,8 +285,8 @@ export async function getMyBookings(role: "guest" | "host") {
 }
 
 /**
- * Suscripción en tiempo real al estado de un booking.
- * Útil para la página de confirmación de pago.
+ * SuscripciÃƒÂ³n en tiempo real al estado de un booking.
+ * ÃƒÅ¡til para la pÃƒÂ¡gina de confirmaciÃƒÂ³n de pago.
  */
 export function subscribeToBookingStatus(
   bookingPreferenceId: string,
