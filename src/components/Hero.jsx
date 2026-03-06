@@ -36,20 +36,20 @@ export default function Hero() {
           <div className="max-w-4xl">
             <div className="hero-badge inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/9 px-4 py-2 text-white/84 backdrop-blur-md">
               <Flame className="h-4 w-4 text-[#d5632a]" />
-              <span className="text-xs font-medium uppercase tracking-[0.18em]">Espacios con parrilla en Montevideo</span>
+              <span className="text-xs font-medium uppercase tracking-[0.18em]">Marketplace de espacios con parrilla en Montevideo</span>
             </div>
 
             <h1 className="mt-8 max-w-4xl">
               <span className="hero-title-line block text-5xl font-semibold leading-[0.96] text-white sm:text-6xl lg:text-7xl xl:text-[5.6rem]">
-                Reserva quinchos, barbacoas y terrazas
+                Reserva el lugar ideal
               </span>
               <span className="hero-title-line mt-2 block font-display text-6xl leading-[0.92] text-[#f6d6c5] sm:text-7xl lg:text-8xl xl:text-[6.6rem]">
-                para tu proximo encuentro.
+                para reunir a tu gente.
               </span>
             </h1>
 
-            <p className="hero-subtitle mt-6 max-w-2xl text-base leading-relaxed text-white/72 sm:text-lg">
-              Busca por zona, revisa disponibilidad real y confirma tu reserva online desde un solo lugar, con un flujo simple tanto para invitados como para anfitriones.
+            <p className="hero-subtitle mt-6 max-w-2xl text-base leading-relaxed text-white/78 sm:text-lg">
+              Prende conecta personas que quieren celebrar con anfitriones que tienen barbacoas, quinchos y terrazas listas para monetizar. Busca, compara, paga y confirma en minutos desde una sola plataforma.
             </p>
 
             <div className="hero-cta mt-8 flex flex-wrap gap-3">
@@ -58,15 +58,15 @@ export default function Hero() {
                 <ArrowRight size={15} />
               </Link>
               <a href="#como-funciona" className="subtle-hover inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/9 px-6 py-3.5 text-sm font-medium text-white backdrop-blur-md transition hover:bg-white/14">
-                Como reservar
+                Ver como funciona
               </a>
             </div>
           </div>
 
           <div className="hero-metrics grid gap-3">
-            <Metric icon={Sparkles} label="Espacios" value="Barbacoas, quinchos y terrazas para asados, reuniones y celebraciones" />
-            <Metric icon={ShieldCheck} label="Reservas" value="Disponibilidad real, pagos online y confirmacion desde tu cuenta" />
-            <Metric icon={Flame} label="Anfitriones" value="Gestiona tu espacio, recibe solicitudes y sigue cada reserva" />
+            <Metric icon={Sparkles} label="Demanda" value="Cumpleanos, asados, reuniones privadas y planes de equipo en un solo marketplace." />
+            <Metric icon={ShieldCheck} label="Reservas" value="Disponibilidad real, pago online y confirmacion clara sin idas y vueltas." />
+            <Metric icon={Flame} label="Hosts" value="Publica tu espacio, ocupa fechas libres y genera ingresos con cada reserva." />
           </div>
         </div>
       </div>

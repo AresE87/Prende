@@ -6,19 +6,19 @@ import { Activity, CalendarDays, CheckCircle2, MapPin, Sparkles } from "lucide-r
 gsap.registerPlugin(ScrollTrigger);
 
 const MAP_PINS = [
-  { label: "Pocitos", price: "desde $800/h", x: "40%", y: "58%" },
-  { label: "Punta Carretas", price: "desde $1.200/h", x: "24%", y: "42%" },
-  { label: "Carrasco", price: "desde $1.500/h", x: "74%", y: "28%" },
-  { label: "Buceo", price: "desde $980/h", x: "55%", y: "46%" },
+  { label: "Pocitos", price: "demanda alta", x: "40%", y: "58%" },
+  { label: "Punta Carretas", price: "ticket medio", x: "24%", y: "42%" },
+  { label: "Carrasco", price: "ticket premium", x: "74%", y: "28%" },
+  { label: "Buceo", price: "alta conversion", x: "55%", y: "46%" },
 ];
 
 const WEEK_DAYS = ["L", "M", "X", "J", "V", "S", "D"];
 const TIME_SLOTS = ["10:00", "13:00", "16:00", "19:00"];
 const TERMINAL_LINES = [
-  "Buscando barbacoas disponibles en Pocitos...",
-  "4 espacios encontrados para 12 personas...",
-  "Reserva enviada al anfitrion y pago en proceso...",
-  "Pago aprobado. Confirmacion lista para tu encuentro.",
+  "Buscando espacios para 12 personas en Pocitos...",
+  "3 opciones listas para comparar y reservar...",
+  "Reserva enviada al anfitrion con pago protegido...",
+  "Pago aprobado. Fecha bloqueada y detalles confirmados.",
 ];
 
 function MapFeature() {
@@ -59,19 +59,19 @@ function MapFeature() {
       <div className="relative z-10 flex h-full flex-col">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#231d19]/38">Busca por zona</p>
+            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#231d19]/38">Captura demanda por ubicacion</p>
             <h3 className="mt-3 text-3xl font-semibold leading-tight text-[#231d19] sm:text-[2.1rem]">
-              Encuentra espacios con parrilla por barrio.
+              La busqueda empieza por barrio. La conversion tambien.
             </h3>
           </div>
           <div className="inline-flex items-center gap-2 rounded-full border border-[#231d19]/8 bg-white/78 px-4 py-2 text-xs font-medium text-[#231d19]/66 shadow-[0_16px_32px_-28px_rgba(73,52,40,0.24)]">
             <MapPin size={14} className="text-[#d5632a]" />
-            4 zonas activas
+            barrios con demanda
           </div>
         </div>
 
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-[#231d19]/58 sm:text-base">
-          Filtra por zona y compara barbacoas, quinchos y terrazas en Pocitos, Punta Carretas, Buceo, Carrasco y otras zonas de Montevideo.
+          Cuando alguien necesita un lugar para reunirse, quiere ver rapido que hay cerca, cuanto cuesta y si encaja con el plan. Prende ordena esa decision desde el primer pantallazo.
         </p>
 
         <div className="relative mt-8 flex-1 overflow-hidden rounded-[32px] border border-[#231d19]/8 bg-[linear-gradient(180deg,rgba(247,243,234,0.96)_0%,rgba(239,232,219,0.82)_100%)] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
@@ -82,7 +82,7 @@ function MapFeature() {
 
           <div className="absolute right-5 top-5 rounded-[26px] border border-[#231d19]/8 bg-white/82 px-4 py-3 shadow-[0_20px_34px_-28px_rgba(73,52,40,0.22)] backdrop-blur-sm">
             <p className="text-[11px] uppercase tracking-[0.2em] text-[#231d19]/36">Montevideo</p>
-            <p className="mt-1 text-sm font-semibold text-[#231d19]">Espacios con parrilla por barrio</p>
+            <p className="mt-1 text-sm font-semibold text-[#231d19]">Oferta ordenada para decidir mas rapido</p>
           </div>
 
           {MAP_PINS.map((pin, index) => (
@@ -138,14 +138,14 @@ function AvailabilityFeature() {
       <div className="relative z-10">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#231d19]/38">Agenda disponible</p>
+            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#231d19]/38">Disponibilidad real</p>
             <h3 className="mt-3 text-2xl font-semibold leading-tight text-[#231d19] sm:text-[2rem]">
-              Consulta fechas y horarios disponibles antes de reservar.
+              Menos ida y vuelta. Mas fechas cerradas.
             </h3>
           </div>
           <div className="inline-flex items-center gap-2 rounded-full border border-[#d5632a]/16 bg-[#fff0e7] px-4 py-2 text-xs font-medium text-[#b75a2f]">
             <CalendarDays size={14} />
-            En vivo
+            agenda visible
           </div>
         </div>
 
@@ -184,7 +184,7 @@ function AvailabilityFeature() {
 
           <div className={`mt-5 flex items-center justify-center gap-2 rounded-[20px] px-4 py-4 text-sm font-semibold transition-all duration-500 ${confirmed ? "bg-[linear-gradient(135deg,#f0c4a7_0%,#d68b5c_100%)] text-[#4a2412] shadow-[0_18px_34px_-24px_rgba(213,99,42,0.42)]" : "bg-[#231d19]/5 text-[#231d19]/35"}`}>
             <CheckCircle2 size={16} />
-            {confirmed ? "Reserva confirmada" : "Esperando seleccion"}
+            {confirmed ? "Reserva confirmada" : "Fecha lista para confirmar"}
           </div>
         </div>
       </div>
@@ -222,14 +222,14 @@ function TelemetryFeature() {
       <div className="relative z-10">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/34">Seguimiento</p>
+            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/34">Operacion visible</p>
             <h3 className="mt-3 text-2xl font-semibold leading-tight text-white sm:text-[2rem]">
-              Recibe confirmaciones y seguimiento de tu reserva.
+              Todo el estado de la reserva en un mismo lugar.
             </h3>
           </div>
           <div className="inline-flex items-center gap-2 rounded-full border border-[#5f6f52]/18 bg-[#5f6f52]/16 px-4 py-2 text-xs font-medium text-[#d9ead0]">
             <Activity size={14} />
-            En vivo
+            reserva activa
           </div>
         </div>
 
@@ -238,7 +238,7 @@ function TelemetryFeature() {
             <span className="h-3 w-3 rounded-full bg-[#d75d5d]" />
             <span className="h-3 w-3 rounded-full bg-[#c9a02f]" />
             <span className="h-3 w-3 rounded-full bg-[#4e9e67]" />
-            <span className="ml-auto text-[11px] uppercase tracking-[0.2em] text-white/28">Sesion activa</span>
+            <span className="ml-auto text-[11px] uppercase tracking-[0.2em] text-white/28">Flujo activo</span>
           </div>
 
           <div className="mt-5 space-y-3 font-mono text-[15px] leading-relaxed">
@@ -268,15 +268,15 @@ export default function Features() {
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-[#231d19]/8 bg-white/76 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.22em] text-[#231d19]/42 shadow-[0_16px_28px_-24px_rgba(73,52,40,0.16)]">
                 <Sparkles size={14} className="text-[#d5632a]" />
-                Reservas online en Prende
+                Marketplace para encuentros
               </div>
               <h2 className="mt-5 font-display text-5xl leading-none text-[#231d19] sm:text-6xl lg:text-7xl">
-                Encuentra, compara y reserva espacios con parrilla sin salir de la plataforma.
+                Una plataforma pensada para atraer demanda, cerrar reservas y ordenar la operacion.
               </h2>
             </div>
 
             <p className="max-w-xl text-sm leading-relaxed text-[#231d19]/58 sm:text-base">
-              Explora zonas de Montevideo, revisa disponibilidad real y confirma tu reserva online con seguimiento antes y despues del pago.
+              Prende muestra oferta, disponibilidad y confirmacion en una experiencia clara para invitados y anfitriones.
             </p>
           </div>
 

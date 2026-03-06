@@ -1,28 +1,32 @@
-import { useState, useEffect, useRef } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { Plus, X } from 'lucide-react'
+import { useState, useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Plus, X } from "lucide-react";
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger);
 
 const faqs = [
   {
-    q: '¿Qué incluye cada espacio?',
-    a: 'Cada espacio tiene parrilla/parrillero, mesa y sillas. Algunos incluyen vajilla, pileta, música y más. Lo ves todo antes de reservar.',
+    q: "Que resuelve exactamente Prende?",
+    a: "Prende es un marketplace para descubrir, comparar y reservar espacios con parrilla en Montevideo. Reune oferta, disponibilidad y pago en una sola experiencia.",
   },
   {
-    q: '¿Tengo que llevar el carbón y la comida?',
-    a: 'Sí, vos llevás lo que querés cocinar. Algunos espacios ofrecen kits de carbón/leña como extra.',
+    q: "Como gana dinero Prende?",
+    a: "La plataforma crece cobrando una comision por cada reserva confirmada. Asi el negocio se alinea con mas ocupacion para los anfitriones y mejor experiencia para quienes reservan.",
   },
   {
-    q: '¿Puedo cancelar si llueve?',
-    a: 'Cancelación gratuita hasta 24 horas antes. Si llueve el mismo día, te ofrecemos reprogramar sin costo.',
+    q: "Si tengo un espacio, como empiezo a ganar?",
+    a: "Publicas tu espacio, defines disponibilidad, precio y condiciones. Cuando llega una reserva, gestionas todo desde tu cuenta y conviertes fechas libres en ingresos.",
   },
   {
-    q: '¿Cómo sé que el espacio es como en las fotos?',
-    a: 'Todos los espacios son verificados por nuestro equipo. Fotos reales, sin filtros ni IA.',
+    q: "Que ve el invitado antes de pagar?",
+    a: "Fotos, capacidad, ubicacion, horarios, precio y extras. La idea es que la decision se tome con la mayor claridad posible antes de confirmar.",
   },
-]
+  {
+    q: "Que pasa si necesito cambiar o cancelar?",
+    a: "Cada reserva muestra sus condiciones antes de confirmar. Ademas, Prende prioriza reprogramaciones simples y una comunicacion clara entre ambas partes.",
+  },
+];
 
 function FAQItem({ faq, isOpen, onToggle }) {
   return (
@@ -36,7 +40,7 @@ function FAQItem({ faq, isOpen, onToggle }) {
         </span>
         <span
           className={`flex-shrink-0 w-8 h-8 rounded-full border border-carbon/10 flex items-center justify-center transition-all duration-300 ${
-            isOpen ? 'bg-brasa border-brasa rotate-0' : 'bg-transparent rotate-0'
+            isOpen ? "bg-brasa border-brasa rotate-0" : "bg-transparent rotate-0"
           }`}
         >
           {isOpen ? (
@@ -48,7 +52,7 @@ function FAQItem({ faq, isOpen, onToggle }) {
       </button>
       <div
         className={`overflow-hidden transition-all duration-500 ease-out ${
-          isOpen ? 'max-h-40 pb-6' : 'max-h-0'
+          isOpen ? "max-h-60 pb-6" : "max-h-0"
         }`}
       >
         <p className="font-inter text-sm sm:text-base text-carbon/60 leading-relaxed pr-16">
@@ -56,42 +60,40 @@ function FAQItem({ faq, isOpen, onToggle }) {
         </p>
       </div>
     </div>
-  )
+  );
 }
 
 export default function FAQ() {
-  const sectionRef = useRef(null)
-  const [openIndex, setOpenIndex] = useState(null)
+  const sectionRef = useRef(null);
+  const [openIndex, setOpenIndex] = useState(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from('.faq-item', {
+      gsap.from(".faq-item", {
         y: 20,
         opacity: 0,
         duration: 0.6,
         stagger: 0.1,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: sectionRef.current, start: 'top 75%' },
-      })
-    }, sectionRef)
-    return () => ctx.revert()
-  }, [])
+        ease: "power3.out",
+        scrollTrigger: { trigger: sectionRef.current, start: "top 75%" },
+      });
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
 
   return (
     <section ref={sectionRef} id="faq" className="bg-cream py-24 sm:py-32">
       <div className="max-w-3xl mx-auto px-6 sm:px-8">
-        {/* Header */}
         <div className="text-center mb-16">
           <span className="inline-block font-mono text-xs font-medium text-carbon/30 tracking-widest uppercase mb-4">
             Preguntas frecuentes
           </span>
           <h2 className="font-jakarta font-bold text-3xl sm:text-4xl text-carbon tracking-tight">
-            Todo lo que necesitás{' '}
-            <span className="font-cormorant italic text-brasa">saber</span>
+            Lo esencial para entender{" "}
+            <span className="font-cormorant italic text-brasa">el negocio</span>
           </h2>
         </div>
 
-        {/* Accordion */}
         <div className="bg-white rounded-3xl border border-carbon/[0.06] p-6 sm:p-8">
           {faqs.map((faq, i) => (
             <div key={i} className="faq-item">
@@ -105,5 +107,5 @@ export default function FAQ() {
         </div>
       </div>
     </section>
-  )
+  );
 }

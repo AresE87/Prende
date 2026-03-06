@@ -31,12 +31,12 @@ export default function FinalCTA() {
           <Flame className="h-8 w-8 text-[#d5632a]" />
         </div>
 
-        <p className="mt-6 text-[11px] uppercase tracking-[0.22em] text-white/46">Reserva online en Montevideo</p>
+        <p className="mt-6 text-[11px] uppercase tracking-[0.22em] text-white/46">Demanda lista para reservar en Montevideo</p>
         <h2 className="mt-4 font-display text-5xl leading-none text-white sm:text-6xl lg:text-7xl">
-          Encuentra el espacio ideal y confirma tu fecha hoy.
+          Si hay un plan, Prende lo convierte en una reserva.
         </h2>
         <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-white/68 sm:text-base">
-          Desde una barbacoa en Pocitos hasta una terraza en Carrasco, Prende reune busqueda, disponibilidad y reserva online en un solo flujo.
+          Para invitados significa menos friccion. Para anfitriones, mas ocupacion y mejores ingresos. Todo dentro de una misma plataforma.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -50,9 +50,9 @@ export default function FinalCTA() {
         </div>
 
         <div className="mt-10 grid gap-3 sm:grid-cols-3">
-          <Stat text="Espacios por zona, capacidad y precio" />
-          <Stat text="Fechas disponibles antes de reservar" />
-          <Stat text="Confirmacion y seguimiento desde tu cuenta" icon />
+          <Stat text="Marketplace para invitados y anfitriones" />
+          <Stat text="Disponibilidad, pago y confirmacion en un solo flujo" />
+          <Stat text="Mas claridad para el cliente y mas conversion para el host" icon />
         </div>
       </div>
     </section>
