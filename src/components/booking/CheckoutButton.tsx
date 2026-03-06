@@ -2,7 +2,7 @@
 // Botón de pago con resumen de precio y flujo de reserva completo
 
 import { useState, useEffect, useMemo } from "react";
-import { useReservation, type ReservationForm } from "../hooks/useReservation";
+import { useReservation, type ReservationForm } from "../../hooks/useReservation";
 
 interface CheckoutButtonProps {
   spaceId:      string;
