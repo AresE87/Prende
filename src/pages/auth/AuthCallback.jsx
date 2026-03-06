@@ -34,7 +34,7 @@ export default function AuthCallback() {
           navigate(getSignedInHome({ isHost: Boolean(profile?.is_host) }), { replace: true });
         } catch {
           if (!active) return;
-          navigate("/buscar", { replace: true });
+          navigate("/", { replace: true });
         }
       } catch {
         if (!active) return;

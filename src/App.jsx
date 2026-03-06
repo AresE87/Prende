@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Suspense, lazy, useEffect } from "react";
-import { AppProvider } from "./context/AppContext";
+import { AppProvider, useApp } from "./context/AppContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -21,6 +21,9 @@ import Pricing from "./components/Pricing";
 import FAQ from "./components/FAQ";
 import FinalCTA from "./components/FinalCTA";
 import Footer from "./components/Footer";
+
+// Dashboard (lazy)
+const Dashboard = lazy(() => import("./pages/Dashboard"));
 
 // Guest flows (lazy)
 const SearchResults = lazy(() => import("./pages/SearchResults"));
@@ -102,6 +105,25 @@ function ScrollToTop() {
   return null;
 }
 
+// Ruta "/" condicional: Landing si no logueado, Dashboard si logueado
+function HomeRoute() {
+  const { state, authLoading } = useApp();
+
+  if (authLoading) return <LoadingScreen />;
+
+  if (state.user) {
+    return (
+      <AppLayout>
+        <Suspense fallback={<LoadingScreen />}>
+          <Dashboard />
+        </Suspense>
+      </AppLayout>
+    );
+  }
+
+  return <LandingPage />;
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -109,8 +131,10 @@ export default function App() {
         <BrowserRouter>
           <ScrollToTop />
           <Routes>
-            {/* Landing page original */}
-            <Route path="/" element={<LandingPage />} />
+            {/* Landing o Dashboard según auth */}
+            <Route path="/" element={<HomeRoute />} />
+            {/* Landing page accesible siempre */}
+            <Route path="/inicio" element={<LandingPage />} />
 
             {/* Auth */}
             <Route path="/login" element={<AppLayout><Login /></AppLayout>} />

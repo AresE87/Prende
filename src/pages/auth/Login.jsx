@@ -78,12 +78,12 @@ export default function Login() {
           return;
         }
 
-        navigate(asHost ? "/anfitrion/onboarding" : "/buscar", { replace: true });
+        navigate(asHost ? "/anfitrion/onboarding" : "/", { replace: true });
       } else {
         const result = await signInWithEmail(data.email, data.password);
         const nextRoute = result.user
           ? await resolveSignedInRoute(result.user.id)
-          : "/buscar";
+          : "/";
         navigate(nextRoute, { replace: true });
       }
     } catch (err) {

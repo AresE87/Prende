@@ -1,8 +1,7 @@
 ﻿import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Flame, User, ArrowRight, CalendarDays, LayoutDashboard, Search } from "lucide-react";
+import { Flame, User, ArrowRight, LayoutDashboard, Search } from "lucide-react";
 import { useApp } from "../context/AppContext";
-import { getSignedInHome } from "../lib/navigation";
 
 const navLinks = [
   { label: "Como reservar", href: "#como-funciona" },
@@ -22,10 +21,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const signedInHome = getSignedInHome(state.user);
-  const signedInSecondary = state.user?.isHost ? "/anfitrion/dashboard" : "/mis-reservas";
-  const secondaryLabel = state.user?.isHost ? "Mi panel" : "Mis reservas";
-  const SecondaryIcon = state.user?.isHost ? LayoutDashboard : CalendarDays;
   const showSignedInActions = !authLoading && state.user;
   const showGuestActions = !authLoading && !state.user;
 
@@ -53,13 +48,13 @@ export default function Navbar() {
         <div className="hidden items-center gap-3 sm:flex">
           {showSignedInActions ? (
             <>
-              <Link to={signedInSecondary} className={`subtle-hover inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${scrolled ? "text-[#171616]/72 hover:text-[#171616]" : "text-white/82 hover:text-white"}`}>
-                <SecondaryIcon size={14} />
-                {secondaryLabel}
+              <Link to="/" className={`subtle-hover inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition ${scrolled ? "text-[#171616]/72 hover:text-[#171616]" : "text-white/82 hover:text-white"}`}>
+                <LayoutDashboard size={14} />
+                Mi dashboard
               </Link>
-              <Link to={signedInHome} className="subtle-hover inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#dc7c4d_0%,#c95f31_100%)] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_34px_-24px_rgba(213,99,42,0.56)] transition hover:bg-[linear-gradient(135deg,#e08a5d_0%,#cd6b41_100%)]">
+              <Link to="/buscar" className="subtle-hover inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#dc7c4d_0%,#c95f31_100%)] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_34px_-24px_rgba(213,99,42,0.56)] transition hover:bg-[linear-gradient(135deg,#e08a5d_0%,#cd6b41_100%)]">
                 <Search size={14} />
-                {state.user.isHost ? "Gestionar espacio" : "Explorar espacios"}
+                Explorar espacios
               </Link>
             </>
           ) : showGuestActions ? (
@@ -103,12 +98,12 @@ export default function Navbar() {
               ))}
               {showSignedInActions ? (
                 <>
-                  <Link to={signedInSecondary} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-[20px] px-4 py-3 text-sm font-medium text-[#171616] transition hover:bg-[#171616]/4">
-                    <SecondaryIcon size={15} /> {secondaryLabel}
+                  <Link to="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-[20px] px-4 py-3 text-sm font-medium text-[#171616] transition hover:bg-[#171616]/4">
+                    <LayoutDashboard size={15} /> Mi dashboard
                   </Link>
-                  <Link to={signedInHome} onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-2 rounded-full bg-[#241f1b] px-5 py-3 text-sm font-semibold text-[#f7f1e8] shadow-[0_16px_28px_-20px_rgba(43,36,31,0.56)]">
+                  <Link to="/buscar" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-2 rounded-full bg-[#241f1b] px-5 py-3 text-sm font-semibold text-[#f7f1e8] shadow-[0_16px_28px_-20px_rgba(43,36,31,0.56)]">
                     <Search size={14} />
-                    {state.user.isHost ? "Gestionar espacio" : "Explorar espacios"}
+                    Explorar espacios
                   </Link>
                 </>
               ) : showGuestActions ? (
