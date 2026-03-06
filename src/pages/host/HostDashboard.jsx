@@ -6,6 +6,7 @@ import { formatUYU, formatDate } from "../../lib/utils";
 import { getMyBookings } from "../../lib/supabase";
 
 const NAV_ITEMS = [
+  { to: "/anfitrion/onboarding", label: "Publicar o mejorar ficha", icon: "PUB", desc: "Edita propuesta, segmentacion y precio" },
   { to: "/anfitrion/calendario", label: "Gestionar disponibilidad", icon: "CAL", desc: "Bloquea fechas y horarios" },
   { to: "/anfitrion/reservas", label: "Reservas", icon: "RES", desc: "Revisa y sigue tus reservas" },
   { to: "/anfitrion/ganancias", label: "Ganancias", icon: "GNS", desc: "Historial y liquidaciones" },
@@ -117,7 +118,7 @@ export default function HostDashboard() {
     <PageContainer>
       <div className="flex items-start justify-between mb-8">
         <SectionTitle sub="Metricas y actividad de tu espacio">Panel de anfitrion</SectionTitle>
-        <Button variant="outline" size="sm" onClick={() => navigate("/anfitrion/reservas")}>Ver reservas</Button>
+        <Button variant="outline" size="sm" onClick={() => navigate("/anfitrion/onboarding")}>Editar ficha</Button>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
