@@ -1,7 +1,7 @@
-import { createElement, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { gsap } from "gsap";
-import { Flame, ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
+import { Flame, ArrowRight } from "lucide-react";
 
 export default function Hero() {
   const sectionRef = useRef(null);
@@ -12,7 +12,6 @@ export default function Hero() {
       tl.from(".hero-badge", { y: 18, opacity: 0, duration: 0.7, delay: 0.2 })
         .from(".hero-title-line", { y: 42, opacity: 0, duration: 0.9, stagger: 0.15 }, "-=0.35")
         .from(".hero-subtitle", { y: 18, opacity: 0, duration: 0.7 }, "-=0.45")
-        .from(".hero-metrics > *", { y: 24, opacity: 0, duration: 0.7, stagger: 0.1 }, "-=0.35")
         .from(".hero-cta", { y: 18, opacity: 0, duration: 0.6, stagger: 0.1 }, "-=0.25");
     }, sectionRef);
 
@@ -32,7 +31,7 @@ export default function Hero() {
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-16 pt-32 sm:px-8 sm:pb-20 lg:pb-24">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
+        <div>
           <div className="max-w-4xl">
             <div className="hero-badge inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/9 px-4 py-2 text-white/84 backdrop-blur-md">
               <Flame className="h-4 w-4 text-[#d5632a]" />
@@ -62,30 +61,8 @@ export default function Hero() {
               </a>
             </div>
           </div>
-
-          <div className="hero-metrics grid gap-3">
-            <Metric icon={Sparkles} label="Demanda" value="Cumpleanos, asados, reuniones privadas y planes de equipo en un solo marketplace." />
-            <Metric icon={ShieldCheck} label="Reservas" value="Disponibilidad real, pago online y confirmacion clara sin idas y vueltas." />
-            <Metric icon={Flame} label="Hosts" value="Publica tu espacio, ocupa fechas libres y genera ingresos con cada reserva." />
-          </div>
         </div>
       </div>
     </section>
-  );
-}
-
-function Metric({ icon, label, value }) {
-  return (
-    <div className="glass-shell subtle-hover rounded-[30px] border-white/8 px-5 py-5 text-white">
-      <div className="flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#241f1b] text-[#f7f1e8] shadow-[0_18px_30px_-22px_rgba(43,36,31,0.58)]">
-          {createElement(icon, { size: 16 })}
-        </div>
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-white/48">{label}</p>
-          <p className="mt-1 text-sm font-medium leading-relaxed text-white/86">{value}</p>
-        </div>
-      </div>
-    </div>
   );
 }
