@@ -10,6 +10,10 @@ import {
   X,
 } from "lucide-react";
 import { AMENITIES, ZONAS, cn, formatUYU } from "../../lib/utils";
+import { useApp } from "../../context/AppContext";
+import { supabase } from "../../lib/supabase";
+import { uploadMultipleImages } from "../../lib/storage";
+import { geocodeAddress } from "../../lib/maps";
 import { Badge, Button, Card, Input, Select, Textarea } from "../../components/shared";
 import {
   ACCESS_TYPES,
@@ -34,6 +38,7 @@ import {
 
 export default function HostOnboarding() {
   const navigate = useNavigate();
+  const { state, dispatch } = useApp();
   const [stepIndex, setStepIndex] = useState(0);
   const [photos, setPhotos] = useState([]);
   const [eventTypes, setEventTypes] = useState([]);
@@ -171,24 +176,91 @@ export default function HostOnboarding() {
     }
 
     setLoading(true);
-    const payload = {
-      ...formData,
-      photos,
-      eventTypes,
-      audiences,
-      ambiences,
-      dayparts,
-      amenities,
-      extraServices,
-      logistics,
-      rules: rules.filter(Boolean),
-      highlights: highlights.filter(Boolean),
-    };
+    setStepMessage("");
 
-    console.log("Publicar espacio:", payload);
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    setLoading(false);
-    navigate("/anfitrion/dashboard");
+    try {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) throw new Error("Debes iniciar sesión para publicar.");
+
+      // Geocode address
+      const coords = await geocodeAddress(`${formData.address}, ${formData.zona}, Montevideo`);
+      if (!coords) throw new Error("No pudimos encontrar la ubicación. Verificá la dirección.");
+
+      // Upload photos to Supabase Storage
+      const spaceId = crypto.randomUUID();
+      const photoFiles = photos.map((p) => p.file);
+      const { successful } = await uploadMultipleImages(spaceId, photoFiles);
+
+      if (successful.length < 3) {
+        throw new Error(`Solo se pudieron subir ${successful.length} fotos. Se necesitan al menos 3.`);
+      }
+
+      const photoUrls = successful.map((r) => r.url);
+
+      // Insert space
+      const { error: spaceError } = await supabase
+        .from("spaces")
+        .insert({
+          id: spaceId,
+          host_id: authUser.id,
+          title: formData.title,
+          description: formData.description,
+          status: "active",
+          address: formData.address,
+          neighborhood: formData.zona,
+          city: "Montevideo",
+          lat: coords.lat,
+          lng: coords.lng,
+          max_guests: formData.maxPersons,
+          min_hours: formData.minHours,
+          price_per_hour: formData.price,
+          amenities: amenities,
+          photos: photoUrls,
+          house_rules: rules.filter(Boolean).join("\n"),
+          metadata: {
+            spaceType: formData.spaceType,
+            hook: formData.hook,
+            businessGoal: formData.businessGoal,
+            seatedCapacity: formData.seatedCapacity,
+            referencePoint: formData.referencePoint,
+            arrivalNotes: formData.arrivalNotes,
+            coverNote: formData.coverNote,
+            weekendPrice: formData.weekendPrice,
+            cleaningFee: formData.cleaningFee,
+            deposit: formData.deposit,
+            advanceNotice: formData.advanceNotice,
+            cancellationPolicy: formData.cancellationPolicy,
+            targetSegment: formData.targetSegment,
+            eventTypes,
+            audiences,
+            ambiences,
+            dayparts,
+            extraServices,
+            logistics,
+            highlights: highlights.filter(Boolean),
+          },
+        });
+
+      if (spaceError) throw spaceError;
+
+      // Mark user as host
+      await supabase
+        .from("profiles")
+        .update({ is_host: true, updated_at: new Date().toISOString() })
+        .eq("id", authUser.id);
+
+      // Update local state
+      if (state.user) {
+        dispatch({ type: "SET_USER", payload: { ...state.user, isHost: true } });
+      }
+
+      navigate("/anfitrion/dashboard");
+    } catch (err) {
+      console.error("Error publicando espacio:", err);
+      setStepMessage(err.message ?? "Ocurrió un error al publicar. Intentá de nuevo.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

@@ -294,9 +294,6 @@ async function scheduleReminders(
   date: string,
   startTime: string
 ) {
-  // Supabase no tiene cron nativo por función.
-  // Estrategia: insertar en una tabla de jobs programados
-  // que un cron externo (GitHub Actions o pg_cron) procesa cada hora.
   const eventDatetime = new Date(`${date}T${startTime}`);
 
   const reminder24h = new Date(eventDatetime);
@@ -305,15 +302,32 @@ async function scheduleReminders(
   const reminder2h = new Date(eventDatetime);
   reminder2h.setHours(reminder2h.getHours() - 2);
 
-  const releaseTime = new Date(eventDatetime);
+  const reviewTime = new Date(eventDatetime);
+  reviewTime.setHours(reviewTime.getHours() + 24);
+
   const releaseDelay = parseInt(Deno.env.get("PAYMENT_RELEASE_DELAY_DAYS") ?? "1");
+  const releaseTime = new Date(eventDatetime);
   releaseTime.setDate(releaseTime.getDate() + releaseDelay);
 
-  // Insertar en tabla de jobs (crear esta tabla en migration si se usa esta estrategia)
-  // Por ahora, loggear — implementar pg_cron en Supabase Pro o GitHub Actions cron
-  console.log(`Recordatorio 24h programado para: ${reminder24h.toISOString()}`);
-  console.log(`Recordatorio 2h programado para:  ${reminder2h.toISOString()}`);
-  console.log(`Liberación de pago para:          ${releaseTime.toISOString()}`);
+  const now = new Date();
+  const reminders = [
+    { booking_id: bookingId, trigger_type: "reminder_24h", scheduled_for: reminder24h.toISOString() },
+    { booking_id: bookingId, trigger_type: "reminder_2h", scheduled_for: reminder2h.toISOString() },
+    { booking_id: bookingId, trigger_type: "review_request", scheduled_for: reviewTime.toISOString() },
+    { booking_id: bookingId, trigger_type: "payment_release", scheduled_for: releaseTime.toISOString() },
+  ].filter((r) => new Date(r.scheduled_for) > now);
+
+  if (reminders.length === 0) return;
+
+  const { error } = await supabase
+    .from("scheduled_reminders")
+    .upsert(reminders, { onConflict: "booking_id,trigger_type" });
+
+  if (error) {
+    console.error("Error programando reminders:", error);
+  } else {
+    console.log(`${reminders.length} recordatorios programados para booking ${bookingId}`);
+  }
 }
 
 // ─── EMAIL TEMPLATES (HTML INLINE) ──────────────────────────

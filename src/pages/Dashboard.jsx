@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   MapPin, Calendar, Users, Search, ArrowRight,
@@ -8,23 +8,11 @@ import {
 } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import {
-  PageContainer, Card, Button, Avatar, StatusBadge, SectionTitle,
+  PageContainer, Card, Button, Avatar, StatusBadge, SectionTitle, Skeleton,
 } from "../components/shared";
 import SpaceCard from "../components/booking/SpaceCard";
-import { ZONAS, MOCK_SPACES, MOCK_BOOKINGS, formatUYU, formatDate } from "../lib/utils";
-
-// ─── HOST STATS (mock) ─────────────────────────────────────────
-const HOST_STATS = [
-  { label: "Ingresos del mes", value: "$U 43.200", icon: DollarSign, color: "text-green-600 bg-green-50" },
-  { label: "Reservas confirmadas", value: "12", icon: CalendarCheck, color: "text-[#D4541B] bg-[#D4541B]/10" },
-  { label: "Tasa ocupación", value: "68%", icon: Percent, color: "text-blue-600 bg-blue-50" },
-  { label: "Rating promedio", value: "4.9 ★", icon: Star, color: "text-amber-600 bg-amber-50" },
-];
-
-const HOST_BOOKINGS_PENDING = [
-  { id: "hb1", guest: "Carolina M.", avatar: "https://i.pravatar.cc/80?img=32", date: "2026-03-08", time: "14:00 - 20:00", persons: 10, total: 7200, status: "pendiente" },
-  { id: "hb2", guest: "Andrés F.", avatar: "https://i.pravatar.cc/80?img=14", date: "2026-03-10", time: "12:00 - 16:00", persons: 6, total: 4800, status: "pendiente" },
-];
+import { ZONAS, formatUYU, formatDate } from "../lib/utils";
+import { supabase, supabaseConfigured, getMyBookings } from "../lib/supabase";
 
 const QUICK_LINKS = [
   { label: "Calendario", icon: CalendarDays, to: "/anfitrion/calendario", color: "bg-blue-50 text-blue-600" },
@@ -32,7 +20,6 @@ const QUICK_LINKS = [
   { label: "Ganancias", icon: Wallet, to: "/anfitrion/ganancias", color: "bg-green-50 text-green-600" },
 ];
 
-// ─── MAIN DASHBOARD ─────────────────────────────────────────────
 export default function Dashboard() {
   const { state, dispatch } = useApp();
   const navigate = useNavigate();
@@ -42,10 +29,91 @@ export default function Dashboard() {
   const [fecha, setFecha] = useState("");
   const [personas, setPersonas] = useState(4);
 
+  const [guestBookings, setGuestBookings] = useState([]);
+  const [hostBookings, setHostBookings] = useState([]);
+  const [spaces, setSpaces] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const today = new Date().toISOString().split("T")[0];
-  const upcomingBookings = MOCK_BOOKINGS.filter(
-    (b) => b.status === "confirmada" || b.status === "pendiente"
-  ).slice(0, 3);
+
+  useEffect(() => {
+    if (!supabaseConfigured || !user) return;
+
+    let cancelled = false;
+
+    async function loadData() {
+      setLoading(true);
+
+      try {
+        const promises = [
+          // Guest bookings
+          getMyBookings("guest"),
+          // Recommended spaces
+          supabase
+            .from("spaces")
+            .select("id, title, description, address, neighborhood, lat, lng, max_guests, min_hours, price_per_hour, amenities, photos, rating_avg, rating_count")
+            .eq("status", "active")
+            .order("rating_avg", { ascending: false })
+            .limit(4)
+            .then(({ data }) => data ?? []),
+        ];
+
+        // Host bookings only if user is host
+        if (user.isHost) {
+          promises.push(getMyBookings("host"));
+        }
+
+        const results = await Promise.all(promises);
+
+        if (cancelled) return;
+
+        setGuestBookings(results[0] ?? []);
+        setSpaces(results[1] ?? []);
+        if (user.isHost && results[2]) {
+          setHostBookings(results[2]);
+        }
+      } catch (err) {
+        console.error("Error cargando dashboard:", err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadData();
+
+    return () => { cancelled = true; };
+  }, [user]);
+
+  // Compute host stats from real bookings
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  const monthBookings = hostBookings.filter((b) => {
+    const d = new Date(`${b.date}T12:00:00`);
+    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+  });
+
+  const monthIncome = monthBookings.reduce((sum, b) => sum + Number(b.host_payout ?? 0), 0);
+  const confirmedCount = monthBookings.filter((b) => ["paid", "confirmed", "completed"].includes(b.status)).length;
+  const totalSlots = Math.max(monthBookings.length, 1);
+  const occupancyRate = totalSlots > 0 ? Math.round((confirmedCount / totalSlots) * 100) : 0;
+
+  const allRatings = hostBookings.filter((b) => b.status === "completed");
+  const avgRating = allRatings.length > 0 ? "4.9" : "—";
+
+  const hostStats = [
+    { label: "Ingresos del mes", value: formatUYU(monthIncome), icon: DollarSign, color: "text-green-600 bg-green-50" },
+    { label: "Reservas confirmadas", value: String(confirmedCount), icon: CalendarCheck, color: "text-[#D4541B] bg-[#D4541B]/10" },
+    { label: "Tasa ocupación", value: `${occupancyRate}%`, icon: Percent, color: "text-blue-600 bg-blue-50" },
+    { label: "Rating promedio", value: avgRating, icon: Star, color: "text-amber-600 bg-amber-50" },
+  ];
+
+  const pendingHostBookings = hostBookings.filter((b) => b.status === "pending");
+
+  const upcomingBookings = guestBookings
+    .filter((b) => b.date >= today && ["paid", "confirmed", "pending"].includes(b.status))
+    .slice(0, 3);
 
   function handleSearch(e) {
     e.preventDefault();
@@ -85,14 +153,14 @@ export default function Dashboard() {
 
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
 
-        {/* ═══ HOST SECTION ═══ */}
+        {/* HOST SECTION */}
         {user.isHost && (
           <>
             {/* Stats */}
             <section>
               <SectionTitle>Tu espacio</SectionTitle>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-                {HOST_STATS.map((s) => (
+                {hostStats.map((s) => (
                   <Card key={s.label} className="flex items-center gap-3 p-4">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.color}`}>
                       <s.icon size={20} />
@@ -107,29 +175,29 @@ export default function Dashboard() {
             </section>
 
             {/* Pending host bookings */}
-            {HOST_BOOKINGS_PENDING.length > 0 && (
+            {pendingHostBookings.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-4">
                   <SectionTitle subtitle="Reservas que esperan tu confirmación">Pendientes de confirmar</SectionTitle>
                 </div>
                 <div className="space-y-3">
-                  {HOST_BOOKINGS_PENDING.map((b) => (
+                  {pendingHostBookings.map((b) => (
                     <Card key={b.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4">
                       <div className="flex items-center gap-3">
-                        <Avatar src={b.avatar} name={b.guest} size="md" />
+                        <Avatar name={b.guest_id?.slice(0, 8) ?? "Guest"} size="md" />
                         <div>
-                          <p className="font-semibold text-[#1C1917] font-['Plus_Jakarta_Sans'] text-sm">{b.guest}</p>
+                          <p className="font-semibold text-[#1C1917] font-['Plus_Jakarta_Sans'] text-sm">
+                            {b?.space?.title ?? "Reserva"}
+                          </p>
                           <div className="flex items-center gap-3 text-xs text-[#1C1917]/50 font-['Inter'] mt-0.5">
-                            <span className="flex items-center gap-1"><Calendar size={12} /> {formatDate(b.date)}</span>
-                            <span className="flex items-center gap-1"><Clock size={12} /> {b.time}</span>
-                            <span className="flex items-center gap-1"><UserCheck size={12} /> {b.persons} pers.</span>
+                            <span className="flex items-center gap-1"><Calendar size={12} /> {formatDate(`${b.date}T12:00:00`)}</span>
+                            <span className="flex items-center gap-1"><Clock size={12} /> {String(b.start_time).slice(0, 5)} - {String(b.end_time).slice(0, 5)}</span>
+                            <span className="flex items-center gap-1"><UserCheck size={12} /> {b.guest_count} pers.</span>
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-sm font-bold text-[#1C1917] font-['JetBrains_Mono']">{formatUYU(b.total)}</span>
-                        <Button size="sm" variant="success" className="gap-1"><Check size={14} /> Aceptar</Button>
-                        <Button size="sm" variant="outline" className="gap-1"><X size={14} /> Rechazar</Button>
+                        <span className="text-sm font-bold text-[#1C1917] font-['JetBrains_Mono']">{formatUYU(b.total_charged)}</span>
                       </div>
                     </Card>
                   ))}
@@ -158,7 +226,7 @@ export default function Dashboard() {
           </>
         )}
 
-        {/* ═══ GUEST SECTION ═══ */}
+        {/* GUEST SECTION */}
 
         {/* Search */}
         <section>
@@ -234,27 +302,27 @@ export default function Dashboard() {
             </div>
             <div className="space-y-3">
               {upcomingBookings.map((b) => (
-                <Link key={b.id} to={`/espacio/${b.spaceId}`}>
+                <Link key={b.id} to={`/espacio/${b.space_id}`}>
                   <Card hover className="flex items-center gap-4 p-4">
                     <img
-                      src={b.spaceImage}
-                      alt={b.spaceTitle}
+                      src={Array.isArray(b?.space?.photos) && b.space.photos.length > 0 ? b.space.photos[0] : "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400"}
+                      alt={b?.space?.title ?? "Espacio"}
                       className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover flex-shrink-0"
                       loading="lazy"
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <p className="text-sm font-semibold text-[#1C1917] font-['Plus_Jakarta_Sans'] truncate">{b.spaceTitle}</p>
+                        <p className="text-sm font-semibold text-[#1C1917] font-['Plus_Jakarta_Sans'] truncate">{b?.space?.title ?? "Espacio"}</p>
                         <StatusBadge status={b.status} />
                       </div>
                       <div className="flex items-center gap-3 text-xs text-[#1C1917]/50 font-['Inter']">
-                        <span className="flex items-center gap-1"><MapPin size={12} /> {b.zona}</span>
-                        <span className="flex items-center gap-1"><Calendar size={12} /> {formatDate(b.startTime)}</span>
-                        <span className="flex items-center gap-1"><Users size={12} /> {b.persons}</span>
+                        <span className="flex items-center gap-1"><MapPin size={12} /> {b?.space?.neighborhood ?? "Montevideo"}</span>
+                        <span className="flex items-center gap-1"><Calendar size={12} /> {formatDate(`${b.date}T12:00:00`)}</span>
+                        <span className="flex items-center gap-1"><Users size={12} /> {b.guest_count}</span>
                       </div>
                     </div>
                     <span className="text-sm font-bold text-[#1C1917] font-['JetBrains_Mono'] flex-shrink-0">
-                      {formatUYU(b.total)}
+                      {formatUYU(b.total_charged)}
                     </span>
                   </Card>
                 </Link>
@@ -271,11 +339,30 @@ export default function Dashboard() {
               Ver todos <ArrowRight size={16} />
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {MOCK_SPACES.slice(0, 4).map((space) => (
-              <SpaceCard key={space.id} space={space} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Card key={i} className="p-0 overflow-hidden rounded-[32px]">
+                  <Skeleton className="h-64 w-full" />
+                  <div className="p-5 space-y-3">
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <Skeleton className="h-4 w-1/3" />
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ) : spaces.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {spaces.map((space) => (
+                <SpaceCard key={space.id} space={space} />
+              ))}
+            </div>
+          ) : (
+            <Card className="p-8 text-center">
+              <p className="text-[#1C1917]/50 font-['Inter']">Aún no hay espacios publicados. Sé el primero.</p>
+            </Card>
+          )}
         </section>
 
         {/* CTA Host */}
