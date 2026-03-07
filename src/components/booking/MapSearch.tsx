@@ -3,9 +3,9 @@
 // Centrado en Montevideo, Uruguay
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { loadGoogleMaps, createSearchMap, type SpaceMarkerData } from "../lib/maps";
-import { searchNearbySpaces, type NearbySpace } from "../lib/supabase";
-import { getTransformedImageUrl } from "../lib/storage";
+import { loadGoogleMaps, createSearchMap, createSpaceMarker, type SpaceMarkerData } from "../../lib/maps";
+import { searchNearbySpaces, type NearbySpace } from "../../lib/supabase";
+import { getTransformedImageUrl } from "../../lib/storage";
 
 interface MapSearchProps {
   initialLat?:   number;
@@ -22,6 +22,7 @@ export default function MapSearch({
 }: MapSearchProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef          = useRef<google.maps.Map | null>(null);
+  const markersRef      = useRef<google.maps.Marker[]>([]);
   const searchBoxRef    = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
@@ -94,10 +95,27 @@ export default function MapSearch({
       });
       setSpaces(results);
 
-      // Actualizar marcadores en el mapa
-      // En una implementación completa, hay que limpiar los marcadores
-      // anteriores y crear los nuevos. Por brevedad, re-crear el mapa.
-      // En producción: usar un Map<id, Overlay> para actualizar solo los cambios.
+      // Limpiar marcadores anteriores
+      markersRef.current.forEach(m => m.setMap(null));
+      markersRef.current = [];
+
+      // Crear nuevos marcadores
+      if (mapRef.current) {
+        results.forEach(space => {
+          const marker = createSpaceMarker(
+            mapRef.current!,
+            {
+              id:           space.id,
+              lat:          space.lat,
+              lng:          space.lng,
+              title:        space.title,
+              pricePerHour: space.price_per_hour,
+            },
+            handleMarkerClick
+          );
+          markersRef.current.push(marker);
+        });
+      }
     } catch (err) {
       console.error("Error buscando espacios:", err);
     } finally {
