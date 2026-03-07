@@ -15,8 +15,8 @@ const plans = [
     features: [
       "Barbacoa simple para encuentros de hasta 8 personas",
       "Ideal para almuerzos, previas y asados chicos",
-      "Ticket accesible para decisiones rapidas",
-      "Entrada clara para nuevos anfitriones",
+      "Precio accesible para planes espontaneos",
+      "Reserva rapida y sin complicaciones",
     ],
   },
   {
@@ -28,8 +28,8 @@ const plans = [
     features: [
       "Quincho equipado para grupos medianos",
       "Mejor equilibrio entre capacidad, comodidad y precio",
-      "Categoria pensada para el mayor volumen de reservas",
-      "Buen punto de conversion para invitados y hosts",
+      "La opcion mas elegida por nuestros usuarios",
+      "Parrilla, mesada y todo lo necesario incluido",
     ],
   },
   {
@@ -41,8 +41,8 @@ const plans = [
     features: [
       "Terrazas o espacios amplios con extras y amenities",
       "Pensado para eventos, equipos y ocasiones especiales",
-      "Mayor ticket por experiencia, capacidad y propuesta",
-      "Mas valor para anfitriones con oferta diferencial",
+      "Amenities completos para una experiencia premium",
+      "Ideal cuando queres algo realmente especial",
     ],
   },
 ];
@@ -72,11 +72,11 @@ export default function Pricing() {
             Rangos orientativos
           </span>
           <h2 className="font-jakarta font-bold text-3xl sm:text-4xl md:text-5xl text-carbon tracking-tight">
-            Entiende rapido cuanto puede costar{" "}
-            <span className="font-cormorant italic text-brasa">o facturar</span> un encuentro
+            Cuanto cuesta alquilar{" "}
+            <span className="font-cormorant italic text-brasa">un espacio?</span>
           </h2>
           <p className="font-inter text-base text-carbon/50 mt-4 max-w-2xl mx-auto">
-            Cada anfitrion define su valor final. Estos rangos ayudan a ubicar tipo de espacio, capacidad y ticket esperado antes de entrar al detalle.
+            Cada anfitrion define su precio. Estos rangos te ayudan a estimar segun el tipo de espacio y la cantidad de personas.
           </p>
         </div>
 
@@ -92,7 +92,7 @@ export default function Pricing() {
             >
               {plan.highlighted && (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-carbon text-crema font-mono text-[10px] tracking-widest uppercase px-4 py-1 rounded-full">
-                  Mayor conversion
+                  Mas popular
                 </span>
               )}
 

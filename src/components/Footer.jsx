@@ -2,7 +2,7 @@ import { Flame } from "lucide-react";
 
 const footerLinks = {
   Producto: [
-    { label: "Marketplace", href: "#espacios" },
+    { label: "Espacios", href: "#espacios" },
     { label: "Como funciona", href: "#como-funciona" },
     { label: "Rangos", href: "#precios" },
     { label: "FAQ", href: "#faq" },
@@ -28,10 +28,10 @@ export default function Footer() {
               </span>
             </div>
             <p className="font-inter text-sm text-crema/40 leading-relaxed mb-6">
-              Marketplace para reservar espacios con parrilla y monetizar fechas libres en Montevideo.
+              Alquila espacios con parrilla por hora en Montevideo. Reserva online y llega con todo listo.
             </p>
             <div className="inline-flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-full px-4 py-2">
-              <span className="font-mono text-[10px] text-crema/30">Marketplace</span>
+              <span className="font-mono text-[10px] text-crema/30">Prende</span>
               <span className="w-1.5 h-1.5 rounded-full bg-oliva animate-pulse" />
               <span className="font-mono text-[10px] text-oliva">Activo</span>
             </div>
@@ -63,7 +63,7 @@ export default function Footer() {
             © 2026 Prende · Montevideo, Uruguay
           </p>
           <p className="font-inter text-xs text-crema/20">
-            Oferta, demanda y reservas mejor resueltas.
+            Espacios con parrilla, listos para tu proximo encuentro.
           </p>
         </div>
       </div>

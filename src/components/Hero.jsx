@@ -35,7 +35,7 @@ export default function Hero() {
           <div className="max-w-4xl">
             <div className="hero-badge inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/9 px-4 py-2 text-white/84 backdrop-blur-md">
               <Flame className="h-4 w-4 text-[#d5632a]" />
-              <span className="text-xs font-medium uppercase tracking-[0.18em]">Marketplace de espacios con parrilla en Montevideo</span>
+              <span className="text-xs font-medium uppercase tracking-[0.18em]">Espacios con parrilla por hora en Montevideo</span>
             </div>
 
             <h1 className="mt-8 max-w-4xl">
@@ -48,7 +48,7 @@ export default function Hero() {
             </h1>
 
             <p className="hero-subtitle mt-6 max-w-2xl text-base leading-relaxed text-white/78 sm:text-lg">
-              Prende conecta personas que quieren celebrar con anfitriones que tienen barbacoas, quinchos y terrazas listas para monetizar. Busca, compara, paga y confirma en minutos desde una sola plataforma.
+              Quinchos, barbacoas y terrazas equipadas para tu proximo cumple, asado o juntada. Elegí zona, fecha y cantidad de personas, y reservá online en minutos.
             </p>
 
             <div className="hero-cta mt-8 flex flex-wrap gap-3">

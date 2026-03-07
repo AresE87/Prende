@@ -14,7 +14,7 @@ const testimonials = [
   },
   {
     before: "Teniamos una barbacoa libre varios fines de semana y nadie sabia que estaba disponible.",
-    after: "Empezamos a recibir consultas mas claras y reservas con mejor intencion de compra.",
+    after: "Empezamos a recibir consultas organizadas y reservas confirmadas sin tener que perseguir a nadie.",
     name: "Diego",
     age: 42,
   },
@@ -59,11 +59,11 @@ export default function SocialProof() {
       <div className="max-w-4xl mx-auto px-6 sm:px-8">
         <div className="sp-header text-center mb-16">
           <span className="inline-block font-mono text-xs font-medium text-crema/30 tracking-widest uppercase mb-4">
-            Prueba social
+            Experiencias reales
           </span>
           <h2 className="font-jakarta font-bold text-3xl sm:text-4xl text-crema tracking-tight">
-            Cuando el proceso se siente facil, la{" "}
-            <span className="font-cormorant italic text-brasa">reserva avanza.</span>
+            Asi lo viven quienes ya{" "}
+            <span className="font-cormorant italic text-brasa">usan Prende.</span>
           </h2>
         </div>
 

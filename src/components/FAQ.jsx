@@ -8,15 +8,15 @@ gsap.registerPlugin(ScrollTrigger);
 const faqs = [
   {
     q: "Que resuelve exactamente Prende?",
-    a: "Prende es un marketplace para descubrir, comparar y reservar espacios con parrilla en Montevideo. Reune oferta, disponibilidad y pago en una sola experiencia.",
+    a: "Prende te permite descubrir, comparar y reservar espacios con parrilla en Montevideo. Ves fotos, disponibilidad y precio, y confirmas tu reserva online en minutos.",
   },
   {
-    q: "Como gana dinero Prende?",
-    a: "La plataforma crece cobrando una comision por cada reserva confirmada. Asi el negocio se alinea con mas ocupacion para los anfitriones y mejor experiencia para quienes reservan.",
+    q: "Reservar tiene algun costo extra?",
+    a: "El precio que ves en cada espacio es el precio final por hora. Prende cobra una pequena comision de servicio que se muestra antes de confirmar, sin sorpresas.",
   },
   {
-    q: "Si tengo un espacio, como empiezo a ganar?",
-    a: "Publicas tu espacio, defines disponibilidad, precio y condiciones. Cuando llega una reserva, gestionas todo desde tu cuenta y conviertes fechas libres en ingresos.",
+    q: "Tengo un espacio con parrilla, como lo publico?",
+    a: "Creas tu cuenta, subis fotos, definís disponibilidad y precio. Tu espacio queda visible para todos los que buscan en tu zona y gestionas las reservas desde tu panel.",
   },
   {
     q: "Que ve el invitado antes de pagar?",
@@ -89,8 +89,8 @@ export default function FAQ() {
             Preguntas frecuentes
           </span>
           <h2 className="font-jakarta font-bold text-3xl sm:text-4xl text-carbon tracking-tight">
-            Lo esencial para entender{" "}
-            <span className="font-cormorant italic text-brasa">el negocio</span>
+            Todo lo que necesitas saber{" "}
+            <span className="font-cormorant italic text-brasa">sobre Prende</span>
           </h2>
         </div>
 

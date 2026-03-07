@@ -23,8 +23,8 @@ const steps = [
   {
     num: "03",
     icon: Flame,
-    title: "Reserva o monetiza",
-    desc: "El invitado llega con todo claro y el anfitrion convierte una fecha libre en un ingreso mejor organizado.",
+    title: "Prende la parrilla",
+    desc: "Llegas con todo confirmado: lugar, horario y direccion. Solo queda disfrutar el encuentro.",
     anim: "pulse",
   },
 ];
@@ -79,11 +79,11 @@ export default function HowItWorks() {
       <div className="max-w-6xl mx-auto px-6 sm:px-8">
         <div className="text-center mb-16">
           <span className="inline-block font-mono text-xs font-medium text-crema/30 tracking-widest uppercase mb-4">
-            Como funciona el marketplace
+            Asi de facil
           </span>
           <h2 className="font-jakarta font-bold text-3xl sm:text-4xl md:text-5xl text-crema tracking-tight">
-            Una experiencia simple para reservar mejor y{" "}
-            <span className="font-cormorant italic text-brasa">vender mejor.</span>
+            Reserva tu espacio en{" "}
+            <span className="font-cormorant italic text-brasa">tres pasos.</span>
           </h2>
         </div>
 

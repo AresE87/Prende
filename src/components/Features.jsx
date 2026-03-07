@@ -6,10 +6,10 @@ import { Activity, CalendarDays, CheckCircle2, MapPin, Sparkles } from "lucide-r
 gsap.registerPlugin(ScrollTrigger);
 
 const MAP_PINS = [
-  { label: "Pocitos", price: "demanda alta", x: "40%", y: "58%" },
-  { label: "Punta Carretas", price: "ticket medio", x: "24%", y: "42%" },
-  { label: "Carrasco", price: "ticket premium", x: "74%", y: "28%" },
-  { label: "Buceo", price: "alta conversion", x: "55%", y: "46%" },
+  { label: "Pocitos", price: "12 espacios", x: "40%", y: "58%" },
+  { label: "Punta Carretas", price: "desde $900/h", x: "24%", y: "42%" },
+  { label: "Carrasco", price: "hasta 30 pers.", x: "74%", y: "28%" },
+  { label: "Buceo", price: "8 espacios", x: "55%", y: "46%" },
 ];
 
 const WEEK_DAYS = ["L", "M", "X", "J", "V", "S", "D"];
@@ -59,19 +59,19 @@ function MapFeature() {
       <div className="relative z-10 flex h-full flex-col">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#231d19]/38">Captura demanda por ubicacion</p>
+            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#231d19]/38">Busca por barrio</p>
             <h3 className="mt-3 text-3xl font-semibold leading-tight text-[#231d19] sm:text-[2.1rem]">
-              La busqueda empieza por barrio. La conversion tambien.
+              Encontra espacios cerca tuyo en segundos.
             </h3>
           </div>
           <div className="inline-flex items-center gap-2 rounded-full border border-[#231d19]/8 bg-white/78 px-4 py-2 text-xs font-medium text-[#231d19]/66 shadow-[0_16px_32px_-28px_rgba(73,52,40,0.24)]">
             <MapPin size={14} className="text-[#d5632a]" />
-            barrios con demanda
+            todos los barrios
           </div>
         </div>
 
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-[#231d19]/58 sm:text-base">
-          Cuando alguien necesita un lugar para reunirse, quiere ver rapido que hay cerca, cuanto cuesta y si encaja con el plan. Prende ordena esa decision desde el primer pantallazo.
+          Filtra por zona, capacidad y precio. Ve fotos, ubicacion y disponibilidad de cada espacio sin salir de la pagina.
         </p>
 
         <div className="relative mt-8 flex-1 overflow-hidden rounded-[32px] border border-[#231d19]/8 bg-[linear-gradient(180deg,rgba(247,243,234,0.96)_0%,rgba(239,232,219,0.82)_100%)] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
@@ -82,7 +82,7 @@ function MapFeature() {
 
           <div className="absolute right-5 top-5 rounded-[26px] border border-[#231d19]/8 bg-white/82 px-4 py-3 shadow-[0_20px_34px_-28px_rgba(73,52,40,0.22)] backdrop-blur-sm">
             <p className="text-[11px] uppercase tracking-[0.2em] text-[#231d19]/36">Montevideo</p>
-            <p className="mt-1 text-sm font-semibold text-[#231d19]">Oferta ordenada para decidir mas rapido</p>
+            <p className="mt-1 text-sm font-semibold text-[#231d19]">Espacios disponibles cerca tuyo</p>
           </div>
 
           {MAP_PINS.map((pin, index) => (
@@ -140,7 +140,7 @@ function AvailabilityFeature() {
           <div>
             <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#231d19]/38">Disponibilidad real</p>
             <h3 className="mt-3 text-2xl font-semibold leading-tight text-[#231d19] sm:text-[2rem]">
-              Menos ida y vuelta. Mas fechas cerradas.
+              Elegí dia y horario sin mensajes de ida y vuelta.
             </h3>
           </div>
           <div className="inline-flex items-center gap-2 rounded-full border border-[#d5632a]/16 bg-[#fff0e7] px-4 py-2 text-xs font-medium text-[#b75a2f]">
@@ -268,15 +268,15 @@ export default function Features() {
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-[#231d19]/8 bg-white/76 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.22em] text-[#231d19]/42 shadow-[0_16px_28px_-24px_rgba(73,52,40,0.16)]">
                 <Sparkles size={14} className="text-[#d5632a]" />
-                Marketplace para encuentros
+                Todo lo que necesitas
               </div>
               <h2 className="mt-5 font-display text-5xl leading-none text-[#231d19] sm:text-6xl lg:text-7xl">
-                Una plataforma pensada para atraer demanda, cerrar reservas y ordenar la operacion.
+                Busca, compara y reserva tu espacio ideal en un solo lugar.
               </h2>
             </div>
 
             <p className="max-w-xl text-sm leading-relaxed text-[#231d19]/58 sm:text-base">
-              Prende muestra oferta, disponibilidad y confirmacion en una experiencia clara para invitados y anfitriones.
+              Fotos, ubicacion, disponibilidad y precio de cada espacio. Todo claro desde el primer momento para que decidas rapido.
             </p>
           </div>
 
