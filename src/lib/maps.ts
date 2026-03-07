@@ -213,7 +213,8 @@ export function createSpaceMarker(
   });
 
   // Pill personalizado como overlay
-  const overlay = new PriceOverlay(
+  const Overlay = getPriceOverlay();
+  const overlay = new Overlay(
     { lat: space.lat, lng: space.lng },
     priceLabel,
     map,
@@ -225,77 +226,92 @@ export function createSpaceMarker(
 }
 
 // ─── PRICE PILL OVERLAY ──────────────────────────────────────
+// Lazy-initialized to avoid "google is not defined" at module load time.
 
-class PriceOverlay extends google.maps.OverlayView {
-  private div: HTMLDivElement | null = null;
+let PriceOverlayClass: (new (
+  position: google.maps.LatLngLiteral,
+  label: string,
+  map: google.maps.Map,
+  spaceId: string,
+  onClick: (id: string) => void,
+) => google.maps.OverlayView) | null = null;
 
-  constructor(
-    private position: google.maps.LatLngLiteral,
-    private label:    string,
-    map:              google.maps.Map,
-    private spaceId:  string,
-    private onClick:  (id: string) => void
-  ) {
-    super();
-    this.setMap(map);
-  }
+function getPriceOverlay() {
+  if (PriceOverlayClass) return PriceOverlayClass;
 
-  onAdd() {
-    this.div = document.createElement("div");
-    this.div.style.cssText = `
-      position: absolute;
-      background: #FF7820;
-      color: #0D0A07;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 6px 10px;
-      border-radius: 20px;
-      cursor: pointer;
-      white-space: nowrap;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-      transform: translate(-50%, -50%);
-      transition: transform 0.15s ease, background 0.15s ease;
-      user-select: none;
-    `;
-    this.div.textContent = this.label;
+  PriceOverlayClass = class PriceOverlay extends google.maps.OverlayView {
+    private div: HTMLDivElement | null = null;
 
-    this.div.addEventListener("mouseenter", () => {
-      if (this.div) {
-        this.div.style.transform = "translate(-50%, -50%) scale(1.1)";
-        this.div.style.background = "#FF9340";
-        this.div.style.zIndex = "100";
-      }
-    });
-    this.div.addEventListener("mouseleave", () => {
-      if (this.div) {
-        this.div.style.transform = "translate(-50%, -50%)";
-        this.div.style.background = "#FF7820";
-        this.div.style.zIndex = "";
-      }
-    });
-    this.div.addEventListener("click", () => this.onClick(this.spaceId));
-
-    this.getPanes()!.overlayMouseTarget.appendChild(this.div);
-  }
-
-  draw() {
-    if (!this.div) return;
-    const overlayProjection = this.getProjection();
-    const point = overlayProjection.fromLatLngToDivPixel(
-      new google.maps.LatLng(this.position)
-    );
-    if (point) {
-      this.div.style.left = `${point.x}px`;
-      this.div.style.top  = `${point.y}px`;
+    constructor(
+      private position: google.maps.LatLngLiteral,
+      private label:    string,
+      map:              google.maps.Map,
+      private spaceId:  string,
+      private onClick:  (id: string) => void
+    ) {
+      super();
+      this.setMap(map);
     }
-  }
 
-  onRemove() {
-    if (this.div?.parentNode) {
-      this.div.parentNode.removeChild(this.div);
-      this.div = null;
+    onAdd() {
+      this.div = document.createElement("div");
+      this.div.style.cssText = `
+        position: absolute;
+        background: #FF7820;
+        color: #0D0A07;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 6px 10px;
+        border-radius: 20px;
+        cursor: pointer;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        transform: translate(-50%, -50%);
+        transition: transform 0.15s ease, background 0.15s ease;
+        user-select: none;
+      `;
+      this.div.textContent = this.label;
+
+      this.div.addEventListener("mouseenter", () => {
+        if (this.div) {
+          this.div.style.transform = "translate(-50%, -50%) scale(1.1)";
+          this.div.style.background = "#FF9340";
+          this.div.style.zIndex = "100";
+        }
+      });
+      this.div.addEventListener("mouseleave", () => {
+        if (this.div) {
+          this.div.style.transform = "translate(-50%, -50%)";
+          this.div.style.background = "#FF7820";
+          this.div.style.zIndex = "";
+        }
+      });
+      this.div.addEventListener("click", () => this.onClick(this.spaceId));
+
+      this.getPanes()!.overlayMouseTarget.appendChild(this.div);
     }
-  }
+
+    draw() {
+      if (!this.div) return;
+      const overlayProjection = this.getProjection();
+      const point = overlayProjection.fromLatLngToDivPixel(
+        new google.maps.LatLng(this.position)
+      );
+      if (point) {
+        this.div.style.left = `${point.x}px`;
+        this.div.style.top  = `${point.y}px`;
+      }
+    }
+
+    onRemove() {
+      if (this.div?.parentNode) {
+        this.div.parentNode.removeChild(this.div);
+        this.div = null;
+      }
+    }
+  } as unknown as typeof PriceOverlayClass;
+
+  return PriceOverlayClass!;
 }
 
 // ─── ESTILO DE MAPA OSCURO ───────────────────────────────────
