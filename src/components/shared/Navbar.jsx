@@ -46,7 +46,7 @@ export default function Navbar() {
             </NavPill>
           )}
           {!state.user?.isHost && (
-            <Link to="/login?mode=register" className="subtle-hover inline-flex items-center gap-2 rounded-full border border-[#171616]/10 bg-white/78 px-4 py-2.5 text-sm font-medium text-[#171616] shadow-[0_12px_28px_-24px_rgba(73,52,40,0.22)] transition hover:bg-white/92">
+            <Link to={state.user ? "/anfitrion/onboarding" : "/login?mode=register"} className="subtle-hover inline-flex items-center gap-2 rounded-full border border-[#171616]/10 bg-white/78 px-4 py-2.5 text-sm font-medium text-[#171616] shadow-[0_12px_28px_-24px_rgba(73,52,40,0.22)] transition hover:bg-white/92">
               <PlusCircle size={15} />
               Publicar espacio
             </Link>
@@ -119,8 +119,10 @@ export default function Navbar() {
                 <>
                   <MobileLink to="/mis-reservas" onClick={() => setMenuOpen(false)} icon={CalendarDays}>Mis reservas</MobileLink>
                   <MobileLink to="/perfil" onClick={() => setMenuOpen(false)} icon={User}>Mi perfil</MobileLink>
-                  {state.user.isHost && (
+                  {state.user.isHost ? (
                     <MobileLink to="/anfitrion/dashboard" onClick={() => setMenuOpen(false)} icon={LayoutDashboard}>Panel anfitrion</MobileLink>
+                  ) : (
+                    <MobileLink to="/anfitrion/onboarding" onClick={() => setMenuOpen(false)} icon={PlusCircle}>Publicar espacio</MobileLink>
                   )}
                   <button type="button" onClick={handleLogout} className="flex w-full items-center gap-3 rounded-[20px] px-4 py-3 text-left text-sm font-medium text-red-600 transition hover:bg-red-50">
                     <LogOut size={16} />
